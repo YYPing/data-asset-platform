@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.dataasset.mapper.SystemAssessmentMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.company.dataasset.entity.SystemAssessment">
+        <id column="id" property="id"/>
+        <result column="system_id" property="systemId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="business_value_score" property="businessValueScore"/>
+        <result column="data_quality_score" property="dataQualityScore"/>
+        <result column="compliance_risk_score" property="complianceRiskScore"/>
+        <result column="technical_feasibility_score" property="technicalFeasibilityScore"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="business_value_detail" property="businessValueDetail"/>
+        <result column="data_quality_detail" property="dataQualityDetail"/>
+        <result column="compliance_risk_detail" property="complianceRiskDetail"/>
+        <result column="technical_feasibility_detail" property="technicalFeasibilityDetail"/>
+        <result column="recommendation" property="recommendation"/>
+        <result column="priority_level" property="priorityLevel"/>
+        <result column="estimated_roi" property="estimatedRoi"/>
+        <result column="estimated_benefit" property="estimatedBenefit"/>
+        <result column="estimated_cost" property="estimatedCost"/>
+        <result column="estimated_effort_days" property="estimatedEffortDays"/>
+        <result column="implementation_roadmap" property="implementationRoadmap"/>
+        <result column="suggested_data_products" property="suggestedDataProducts"/>
+        <result column="risk_warnings" property="riskWarnings"/>
+        <result column="assessor_id" property="assessorId"/>
+        <result column="assessment_date" property="assessmentDate"/>
+        <result column="review_status" property="reviewStatus"/>
+        <result column="reviewer_id" property="reviewerId"/>
+        <result column="review_date" property="reviewDate"/>
+        <result column="review_comments" property="reviewComments"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- 根据系统ID查询评估记录 -->
+    <select id="selectBySystemId" resultMap="BaseResultMap">
+        SELECT * FROM system_assessment 
+        WHERE system_id = #{systemId} 
+          AND deleted = 0
+        ORDER BY assessment_date DESC
+        LIMIT 1
+    </select>
+
+    <!-- 根据项目ID查询评估列表 -->
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE cs.project_id = #{projectId} 
+          AND sa.deleted = 0
+          AND cs.deleted = 0
+        ORDER BY sa.total_score DESC, sa.assessment_date DESC
+    </select>
+
+    <!-- 分页查询评估记录 -->
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE sa.deleted = 0
+          AND cs.deleted = 0
+        <if test="systemName != null and systemName != ''">
+            AND cs.system_name LIKE CONCAT('%', #{systemName}, '%')
+        </if>
+        <if test="projectId != null">
+            AND cs.project_id = #{projectId}
+        </if>
+        <if test="reviewStatus != null and reviewStatus != ''">
+            AND sa.review_status = #{reviewStatus}
+        </if>
+        <if test="priorityLevel != null and priorityLevel != ''">
+            AND sa.priority_level = #{priorityLevel}
+        </if>
+        ORDER BY sa.total_score DESC, sa.assessment_date DESC
+    </select>
+
+    <!-- 根据综合评分排序查询 -->
+    <select id="selectByTotalScoreDesc" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.total_score IS NOT NULL
+        ORDER BY sa.total_score DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 查询需要审核的评估记录 -->
+    <select id="selectNeedReview" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.review_status IN ('pending', 'needs_revision')
+        ORDER BY sa.priority_level DESC, sa.total_score DESC
+    </select>
+
+    <!-- 查询已审核通过的评估记录 -->
+    <select id="selectApproved" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.review_status = 'approved'
+        ORDER BY sa.priority_level DESC, sa.total_score DESC
+    </select>
+
+    <!-- 更新审核状态 -->
+    <update id="updateReviewStatus">
+        UPDATE system_assessment 
+        SET review_status = #{reviewStatus},
+            reviewer_id = #{reviewerId},
+            review_date = CURDATE(),
+            review_comments = #{reviewComments},
+            updated_at = NOW()
+        WHERE id = #{id} 
+          AND deleted = 0
+    </update>
+
+    <!-- 批量更新审核状态 -->
+    <update id="batchUpdateReviewStatus">
+        UPDATE system_assessment 
+        SET review_status = #{reviewStatus},
+            reviewer_id = #{reviewerId},
+            review_date = CURDATE(),
+            updated_at = NOW()
+        WHERE id IN 
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted = 0
+    </update>
+
+    <!-- 计算系统平均评分 -->
+    <select id="calculateAverageScores" resultType="map">
+        SELECT 
+            AVG(business_value_score) as avg_business_value,
+            AVG(data_quality_score) as avg_data_quality,
+            AVG(compliance_risk_score) as avg_compliance_risk,
+            AVG(technical_feasibility_score) as avg_technical_feasibility,
+            AVG(total_score) as avg_total_score,
+            COUNT(*) as assessment_count
+        FROM system_assessment 
+        WHERE system_id = #{systemId} 
+          AND deleted = 0
+          AND total_score IS NOT NULL
+    </select>
+
+    <!-- 获取项目评估统计 -->
+    <select id="getProjectAssessmentStats" resultType="map">
+        SELECT 
+            COUNT(*) as total_assessments,
+            SUM(CASE WHEN review_status = 'approved' THEN 1 ELSE 0 END) as approved_count,
+            SUM(CASE WHEN review_status = 'pending' THEN 1 ELSE 0 END) as pending_count,
+            SUM(CASE WHEN review_status = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
+            SUM(CASE WHEN review_status = 'needs_revision' THEN 1 ELSE 0 END) as needs_revision_count,
+            AVG(total_score) as avg_total_score,
+            AVG(estimated_roi) as avg_estimated_roi,
+            SUM(estimated_benefit) as total_estimated_benefit,
+            SUM(estimated_cost) as total_estimated_cost
+        FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE cs.project_id = #{projectId} 
+          AND sa.deleted = 0
+          AND cs.deleted = 0
+    </select>
+
+    <!-- 获取优先级分布 -->
+    <select id="getPriorityDistribution" resultType="map">
+        SELECT 
+            priority_level as level,
+            COUNT(*) as count
+        FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE cs.project_id = #{projectId} 
+          AND sa.deleted = 0
+          AND cs.deleted = 0
+          AND sa.priority_level IS NOT NULL
+        GROUP BY sa.priority_level
+        ORDER BY 
+            CASE sa.priority_level
+                WHEN 'critical' THEN 1
+                WHEN 'high' THEN 2
+                WHEN 'medium' THEN 3
+                WHEN 'low' THEN 4
+                ELSE 5
+            END
+    </select>
+
+    <!-- 获取评分区间分布 -->
+    <select id="getScoreDistribution" resultType="map">
+        SELECT 
+            CASE 
+                WHEN total_score >= 90 THEN '优秀 (90-100)'
+                WHEN total_score >= 80 THEN '良好 (80-89)'
+                WHEN total_score >= 70 THEN '中等 (70-79)'
+                WHEN total_score >= 60 THEN '及格 (60-69)'
+                ELSE '不及格 (0-59)'
+            END as score_range,
+            COUNT(*) as count
+        FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE cs.project_id = #{projectId} 
+          AND sa.deleted = 0
+          AND cs.deleted = 0
+          AND sa.total_score IS NOT NULL
+        GROUP BY 
+            CASE 
+                WHEN total_score >= 90 THEN '优秀 (90-100)'
+                WHEN total_score >= 80 THEN '良好 (80-89)'
+                WHEN total_score >= 70 THEN '中等 (70-79)'
+                WHEN total_score >= 60 THEN '及格 (60-69)'
+                ELSE '不及格 (0-59)'
+            END
+        ORDER BY 
+            CASE 
+                WHEN total_score >= 90 THEN 1
+                WHEN total_score >= 80 THEN 2
+                WHEN total_score >= 70 THEN 3
+                WHEN total_score >= 60 THEN 4
+                ELSE 5
+            END
+    </select>
+
+    <!-- 获取投资回报率排名 -->
+    <select id="getRoiRanking" resultType="map">
+        SELECT 
+            cs.system_name,
+            sa.estimated_roi,
+            sa.total_score,
+            sa.priority_level
+        FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE sa.deleted = 0
+          AND cs.deleted = 0
+          AND sa.estimated_roi IS NOT NULL
+          AND sa.review_status = 'approved'
+        ORDER BY sa.estimated_roi DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取实施成本排名 -->
+    <select id="getCostRanking" resultType="map">
+        SELECT 
+            cs.system_name,
+            sa.estimated_cost,
+            sa.estimated_benefit,
+            sa.estimated_roi
+        FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE sa.deleted = 0
+          AND cs.deleted = 0
+          AND sa.estimated_cost IS NOT NULL
+          AND sa.review_status = 'approved'
+        ORDER BY sa.estimated_cost
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取预计收益排名 -->
+    <select id="getBenefitRanking" resultType="map">
+        SELECT 
+            cs.system_name,
+            sa.estimated_benefit,
+            sa.estimated_cost,
+            sa.estimated_roi
+        FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE sa.deleted = 0
+          AND cs.deleted = 0
+          AND sa.estimated_benefit IS NOT NULL
+          AND sa.review_status = 'approved'
+        ORDER BY sa.estimated_benefit DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 查询即将到期的评估（一年未更新） -->
+    <select id="selectExpiringAssessments" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.assessment_date &lt; DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+          AND sa.review_status = 'approved'
+        ORDER BY sa.assessment_date
+    </select>
+
+    <!-- 根据评估日期范围查询 -->
+    <select id="selectByAssessmentDateRange" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.assessment_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY sa.assessment_date DESC, sa.total_score DESC
+    </select>
+
+    <!-- 获取评估人统计 -->
+    <select id="getAssessorStatistics" resultType="map">
+        SELECT 
+            assessor_id,
+            COUNT(*) as assessment_count,
+            AVG(total_score) as avg_score,
+            MIN(assessment_date) as first_assessment,
+            MAX(assessment_date) as last_assessment
+        FROM system_assessment 
+        WHERE deleted = 0
+          AND assessor_id IS NOT NULL
+        GROUP BY assessor_id
+        ORDER BY assessment_count DESC
+    </select>
+
+    <!-- 获取审核人统计 -->
+    <select id="getReviewerStatistics" resultType="map">
+        SELECT 
+            reviewer_id,
+            COUNT(*) as review_count,
+            SUM(CASE WHEN review_status = 'approved' THEN 1 ELSE 0 END) as approved_count,
+            SUM(CASE WHEN review_status = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
+            MIN(review_date) as first_review,
+            MAX(review_date) as last_review
+        FROM system_assessment 
+        WHERE deleted = 0
+          AND reviewer_id IS NOT NULL
+        GROUP BY reviewer_id
+        ORDER BY review_count DESC
+    </select>
+
+    <!-- 查询高风险评估（合规风险高） -->
+    <select id="selectHighRiskAssessments" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.compliance_risk_score &gt;= #{threshold}
+          AND sa.review_status = 'approved'
+        ORDER BY sa.compliance_risk_score DESC, sa.total_score DESC
+    </select>
+
+    <!-- 查询高价值评估（综合评分高） -->
+    <select id="selectHighValueAssessments" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.total_score &gt;= #{threshold}
+          AND sa.review_status = 'approved'
+        ORDER BY sa.total_score DESC, sa.priority_level DESC
+    </select>
+
+    <!-- 查询推荐立即挖掘的评估 -->
+    <select id="selectRecommendedForImmediateMining" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.recommendation = 'immediate'
+          AND sa.review_status = 'approved'
+        ORDER BY sa.priority_level DESC, sa.total_score DESC
+    </select>
+
+    <!-- 查询推荐优先挖掘的评估 -->
+    <select id="selectRecommendedForPriorityMining" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        WHERE sa.deleted = 0
+          AND sa.recommendation IN ('immediate', 'priority')
+          AND sa.review_status = 'approved'
+        ORDER BY 
+            CASE sa.recommendation
+                WHEN 'immediate' THEN 1
+                WHEN 'priority' THEN 2
+                ELSE 3
+            END,
+            sa.priority_level DESC,
+            sa.total_score DESC
+    </select>
+
+    <!-- 更新评估分数 -->
+    <update id="updateScores">
+        UPDATE system_assessment 
+        SET business_value_score = #{businessValueScore},
+            data_quality_score = #{dataQualityScore},
+            compliance_risk_score = #{complianceRiskScore},
+            technical_feasibility_score = #{technicalFeasibilityScore},
+            total_score = #{totalScore},
+            updated_at = NOW()
+        WHERE id = #{id} 
+          AND deleted = 0
+    </update>
+
+    <!-- 更新投资回报分析 -->
+    <update id="updateRoiAnalysis">
+        UPDATE system_assessment 
+        SET estimated_roi = #{estimatedRoi},
+            estimated_benefit = #{estimatedBenefit},
+            estimated_cost = #{estimatedCost},
+            estimated_effort_days = #{estimatedEffortDays},
+            updated_at = NOW()
+        WHERE id = #{id} 
+          AND deleted = 0
+    </update>
+
+    <!-- 查询相似系统评估（同类型系统） -->
+    <select id="selectSimilarAssessments" resultMap="BaseResultMap">
+        SELECT sa.* FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE sa.deleted = 0
+          AND cs.deleted = 0
+          AND cs.system_type = #{systemType}
+          AND sa.review_status = 'approved'
+        ORDER BY sa.total_score DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取评估趋势分析（按时间） -->
+    <select id="getAssessmentTrend" resultType="map">
+        SELECT 
+            DATE(sa.assessment_date) as assessment_date,
+            COUNT(*) as assessment_count,
+            AVG(sa.total_score) as avg_score,
+            AVG(sa.estimated_roi) as avg_roi
+        FROM system_assessment sa
+        INNER JOIN customer_system cs ON sa.system_id = cs.id
+        WHERE cs.project_id = #{projectId} 
+          AND sa.deleted = 0
+          AND cs.deleted = 0
+          AND sa.assessment_date &gt;= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+        GROUP BY DATE(sa.assessment_date)
+        ORDER BY assessment_date
+    </select>
+
+    <!-- 逻辑删除 -->
+    <update id="deleteById">
+        UPDATE system_assessment 
+        SET deleted = 1,
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
