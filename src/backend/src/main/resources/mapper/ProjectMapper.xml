@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.dataasset.mapper.ProjectMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.company.dataasset.entity.Project">
+        <id column="id" property="id" />
+        <result column="project_code" property="projectCode" />
+        <result column="customer_id" property="customerId" />
+        <result column="project_name" property="projectName" />
+        <result column="project_type" property="projectType" />
+        <result column="description" property="description" />
+        <result column="contract_amount" property="contractAmount" />
+        <result column="start_date" property="startDate" />
+        <result column="end_date" property="endDate" />
+        <result column="current_phase" property="currentPhase" />
+        <result column="status" property="status" />
+        <result column="manager_id" property="managerId" />
+        <result column="progress" property="progress" />
+        <result column="created_by" property="createdBy" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_code, customer_id, project_name, project_type, description,
+        contract_amount, start_date, end_date, current_phase, status, manager_id,
+        progress, created_by, created_at, updated_by, updated_at, deleted
+    </sql>
+
+    <!-- 根据项目编码查询 -->
+    <select id="selectByProjectCode" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM project
+        WHERE project_code = #{projectCode}
+        AND deleted = 0
+    </select>
+
+    <!-- 根据客户ID查询项目 -->
+    <select id="selectByCustomerId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM project
+        WHERE customer_id = #{customerId}
+        AND deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 查询所有进行中的项目 -->
+    <select id="selectAllActive" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM project
+        WHERE status = 'active'
+        AND deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 分页查询项目列表 -->
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM project
+        WHERE deleted = 0
+        <if test="projectName != null and projectName != ''">
+            AND project_name LIKE CONCAT('%', #{projectName}, '%')
+        </if>
+        <if test="customerId != null">
+            AND customer_id = #{customerId}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="projectType != null and projectType != ''">
+            AND project_type = #{projectType}
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 生成项目编码 -->
+    <select id="generateProjectCode" resultType="java.lang.String">
+        SELECT CONCAT('P', DATE_FORMAT(NOW(), '%Y%m'), LPAD(COUNT(*) + 1, 4, '0'))
+        FROM project
+        WHERE DATE_FORMAT(created_at, '%Y%m') = DATE_FORMAT(NOW(), '%Y%m')
+    </select>
+
+    <!-- 更新项目进度 -->
+    <update id="updateProgress">
+        UPDATE project
+        SET progress = #{progress},
+            updated_at = NOW(),
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+    <!-- 更新项目阶段 -->
+    <update id="updatePhase">
+        UPDATE project
+        SET current_phase = #{currentPhase},
+            updated_at = NOW(),
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+    <!-- 更新项目状态 -->
+    <update id="updateStatus">
+        UPDATE project
+        SET status = #{status},
+            updated_at = NOW(),
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+    <!-- 逻辑删除项目 -->
+    <update id="deleteById">
+        UPDATE project
+        SET deleted = 1,
+            updated_at = NOW(),
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+    <!-- 获取项目统计信息 -->
+    <select id="getProjectStats" resultType="java.util.Map">
+        SELECT
+            COUNT(*) as total_count,
+            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_count,
+            SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_count,
+            SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled_count,
+            AVG(progress) as avg_progress,
+            SUM(contract_amount) as total_contract_amount
+        FROM project
+        WHERE deleted = 0
+    </select>
+
+    <!-- 获取客户的项目统计 -->
+    <select id="getCustomerProjectStats" resultType="java.util.Map">
+        SELECT
+            customer_id,
+            COUNT(*) as project_count,
+            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_count,
+            SUM(contract_amount) as total_contract_amount,
+            AVG(progress) as avg_progress
+        FROM project
+        WHERE deleted = 0
+        GROUP BY customer_id
+    </select>
+
+    <!-- 获取项目阶段分布 -->
+    <select id="getPhaseDistribution" resultType="java.util.Map">
+        SELECT
+            current_phase as phase,
+            COUNT(*) as count
+        FROM project
+        WHERE deleted = 0
+        AND status = 'active'
+        GROUP BY current_phase
+        ORDER BY count DESC
+    </select>
+
+    <!-- 查询即将到期的项目 -->
+    <select id="selectExpiringProjects" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM project
+        WHERE deleted = 0
+        AND status = 'active'
+        AND end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+        ORDER BY end_date ASC
+    </select>
+
+    <!-- 查询需要关注的项目（进度低于50%且即将到期） -->
+    <select id="selectNeedAttentionProjects" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM project
+        WHERE deleted = 0
+        AND status = 'active'
+        AND progress &lt; 50
+        AND end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 60 DAY)
+        ORDER BY progress ASC, end_date ASC
+    </select>
+
+</mapper>

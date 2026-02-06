@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.dataasset.mapper.CustomerSystemMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.company.dataasset.entity.CustomerSystem">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="system_code" property="systemCode"/>
+        <result column="system_name" property="systemName"/>
+        <result column="system_type" property="systemType"/>
+        <result column="business_domain" property="businessDomain"/>
+        <result column="description" property="description"/>
+        <result column="vendor" property="vendor"/>
+        <result column="version" property="version"/>
+        <result column="database_type" property="databaseType"/>
+        <result column="estimated_data_volume" property="estimatedDataVolume"/>
+        <result column="data_growth_rate" property="dataGrowthRate"/>
+        <result column="security_level" property="securityLevel"/>
+        <result column="data_classification" property="dataClassification"/>
+        <result column="compliance_certifications" property="complianceCertifications"/>
+        <result column="last_security_assessment" property="lastSecurityAssessment"/>
+        <result column="business_criticality" property="businessCriticality"/>
+        <result column="user_count" property="userCount"/>
+        <result column="daily_transaction_volume" property="dailyTransactionVolume"/>
+        <result column="annual_transaction_amount" property="annualTransactionAmount"/>
+        <result column="business_owner" property="businessOwner"/>
+        <result column="business_owner_phone" property="businessOwnerPhone"/>
+        <result column="it_owner" property="itOwner"/>
+        <result column="it_owner_phone" property="itOwnerPhone"/>
+        <result column="data_owner" property="dataOwner"/>
+        <result column="data_owner_phone" property="dataOwnerPhone"/>
+        <result column="status" property="status"/>
+        <result column="is_selected" property="isSelected"/>
+        <result column="selection_reason" property="selectionReason"/>
+        <result column="priority_level" property="priorityLevel"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 根据项目ID查询系统列表 -->
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT * FROM customer_system 
+        WHERE project_id = #{projectId} 
+          AND deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据系统编码查询 -->
+    <select id="selectBySystemCode" resultMap="BaseResultMap">
+        SELECT * FROM customer_system 
+        WHERE system_code = #{systemCode} 
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 分页查询系统列表 -->
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT * FROM customer_system 
+        WHERE deleted = 0
+        <if test="systemName != null and systemName != ''">
+            AND system_name LIKE CONCAT('%', #{systemName}, '%')
+        </if>
+        <if test="projectId != null">
+            AND project_id = #{projectId}
+        </if>
+        <if test="systemType != null and systemType != ''">
+            AND system_type = #{systemType}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 更新系统状态 -->
+    <update id="updateStatus">
+        UPDATE customer_system 
+        SET status = #{status},
+            updated_at = NOW()
+        WHERE id = #{id} 
+          AND deleted = 0
+    </update>
+
+    <!-- 更新选中状态 -->
+    <update id="updateSelection">
+        UPDATE customer_system 
+        SET is_selected = #{isSelected},
+            selection_reason = #{selectionReason},
+            updated_at = NOW()
+        WHERE id = #{id} 
+          AND deleted = 0
+    </update>
+
+    <!-- 逻辑删除 -->
+    <update id="deleteById">
+        UPDATE customer_system 
+        SET deleted = 1,
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 获取项目系统统计 -->
+    <select id="getProjectSystemStats" resultType="map">
+        SELECT 
+            COUNT(*) as total_systems,
+            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_systems,
+            SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive_systems,
+            SUM(CASE WHEN is_selected = 1 THEN 1 ELSE 0 END) as selected_systems,
+            COUNT(DISTINCT system_type) as system_type_count,
+            COUNT(DISTINCT business_domain) as business_domain_count
+        FROM customer_system 
+        WHERE project_id = #{projectId} 
+          AND deleted = 0
+    </select>
+
+    <!-- 获取系统类型分布 -->
+    <select id="getSystemTypeDistribution" resultType="map">
+        SELECT 
+            system_type as type,
+            COUNT(*) as count
+        FROM customer_system 
+        WHERE project_id = #{projectId} 
+          AND deleted = 0
+        GROUP BY system_type
+        ORDER BY count DESC
+    </select>
+
+    <!-- 获取业务关键性分布 -->
+    <select id="getBusinessCriticalityDistribution" resultType="map">
+        SELECT 
+            business_criticality as level,
+            COUNT(*) as count
+        FROM customer_system 
+        WHERE project_id = #{projectId} 
+          AND deleted = 0
+          AND business_criticality IS NOT NULL
+        GROUP BY business_criticality
+        ORDER BY business_criticality
+    </select>
+
+    <!-- 获取安全级别分布 -->
+    <select id="getSecurityLevelDistribution" resultType="map">
+        SELECT 
+            security_level as level,
+            COUNT(*) as count
+        FROM customer_system 
+        WHERE project_id = #{projectId} 
+          AND deleted = 0
+          AND security_level IS NOT NULL
+        GROUP BY security_level
+        ORDER BY security_level
+    </select>
+
+    <!-- 查询需要评估的系统 -->
+    <select id="selectNeedAssessmentSystems" resultMap="BaseResultMap">
+        SELECT cs.* 
+        FROM customer_system cs
+        LEFT JOIN system_assessment sa ON cs.id = sa.system_id AND sa.deleted = 0
+        WHERE cs.deleted = 0
+          AND cs.status = 'active'
+          AND (sa.id IS NULL OR sa.assessment_date &lt; DATE_SUB(NOW(), INTERVAL 1 YEAR))
+        ORDER BY cs.priority_level DESC, cs.business_criticality DESC
+    </select>
+
+    <!-- 查询已选中待挖掘的系统 -->
+    <select id="selectSelectedSystems" resultMap="BaseResultMap">
+        SELECT * FROM customer_system 
+        WHERE deleted = 0
+          AND status = 'active'
+          AND is_selected = 1
+        ORDER BY priority_level DESC, business_criticality DESC
+    </select>
+
+    <!-- 生成系统编码 -->
+    <select id="generateSystemCode" resultType="string">
+        SELECT CONCAT('S', DATE_FORMAT(NOW(), '%Y%m'), 
+               LPAD(COALESCE(MAX(SUBSTRING(system_code, 8)), 0) + 1, 4, '0'))
+        FROM customer_system 
+        WHERE system_code LIKE CONCAT('S', DATE_FORMAT(NOW(), '%Y%m'), '%')
+    </select>
+
+    <!-- 批量更新系统状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE customer_system 
+        SET status = #{status},
+            updated_at = NOW()
+        WHERE id IN 
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted = 0
+    </update>
+
+    <!-- 根据业务领域查询系统 -->
+    <select id="selectByBusinessDomain" resultMap="BaseResultMap">
+        SELECT * FROM customer_system 
+        WHERE business_domain = #{businessDomain} 
+          AND deleted = 0
+        ORDER BY business_criticality DESC, system_name
+    </select>
+
+    <!-- 获取系统负责人统计 -->
+    <select id="getOwnerStatistics" resultType="map">
+        SELECT 
+            'business_owner' as owner_type,
+            business_owner as owner_name,
+            COUNT(*) as system_count
+        FROM customer_system 
+        WHERE deleted = 0 
+          AND business_owner IS NOT NULL
+        GROUP BY business_owner
+        
+        UNION ALL
+        
+        SELECT 
+            'it_owner' as owner_type,
+            it_owner as owner_name,
+            COUNT(*) as system_count
+        FROM customer_system 
+        WHERE deleted = 0 
+          AND it_owner IS NOT NULL
+        GROUP BY it_owner
+        
+        UNION ALL
+        
+        SELECT 
+            'data_owner' as owner_type,
+            data_owner as owner_name,
+            COUNT(*) as system_count
+        FROM customer_system 
+        WHERE deleted = 0 
+          AND data_owner IS NOT NULL
+        GROUP BY data_owner
+        
+        ORDER BY owner_type, system_count DESC
+    </select>
+
+    <!-- 查询即将需要安全评估的系统 -->
+    <select id="selectNeedSecurityAssessment" resultMap="BaseResultMap">
+        SELECT * FROM customer_system 
+        WHERE deleted = 0
+          AND status = 'active'
+          AND (last_security_assessment IS NULL 
+               OR last_security_assessment &lt; DATE_SUB(CURDATE(), INTERVAL 1 YEAR))
+        ORDER BY business_criticality DESC, system_name
+    </select>
+
+    <!-- 获取系统数据量统计 -->
+    <select id="getDataVolumeStatistics" resultType="map">
+        SELECT 
+            COUNT(*) as total_systems,
+            SUM(CASE WHEN estimated_data_volume = 'small' THEN 1 ELSE 0 END) as small_systems,
+            SUM(CASE WHEN estimated_data_volume = 'medium' THEN 1 ELSE 0 END) as medium_systems,
+            SUM(CASE WHEN estimated_data_volume = 'large' THEN 1 ELSE 0 END) as large_systems,
+            SUM(CASE WHEN estimated_data_volume = 'very_large' THEN 1 ELSE 0 END) as very_large_systems,
+            AVG(CASE 
+                WHEN data_growth_rate = 'low' THEN 5
+                WHEN data_growth_rate = 'medium' THEN 15
+                WHEN data_growth_rate = 'high' THEN 30
+                ELSE 0 
+            END) as avg_growth_rate_percent
+        FROM customer_system 
+        WHERE project_id = #{projectId} 
+          AND deleted = 0
+    </select>
+
+</mapper>

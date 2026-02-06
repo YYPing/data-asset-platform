@@ -1,0 +1,128 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: data-asset-platform
+  
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/data_asset?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: your_password
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+  
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6379
+    password: 
+    database: 0
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+  
+  # Jackson配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+  
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath:/mapper/**/*.xml
+  type-aliases-package: com.company.dataasset.entity
+
+# JWT配置
+jwt:
+  secret: your-256-bit-secret-key-for-jwt-signing-must-be-at-least-32-characters-long
+  expiration: 86400000  # 24小时
+  header: Authorization
+  prefix: Bearer
+
+# MinIO配置
+minio:
+  endpoint: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: data-asset
+
+# 日志配置
+logging:
+  level:
+    com.company.dataasset: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: logs/data-asset-platform.log
+
+# 自定义配置
+app:
+  # 文件存储路径
+  file:
+    upload-path: /opt/data-asset/uploads
+    temp-path: /opt/data-asset/temp
+  
+  # 报告模板路径
+  report:
+    template-path: /opt/data-asset/templates
+    output-path: /opt/data-asset/reports
+  
+  # 系统配置
+  system:
+    # 密码加密强度
+    password-strength: 10
+    # 登录失败锁定次数
+    login-max-attempts: 5
+    # 登录失败锁定时间（分钟）
+    login-lock-duration: 30
+
+# Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+# SpringDoc OpenAPI配置
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

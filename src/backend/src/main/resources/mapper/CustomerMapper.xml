@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.dataasset.mapper.CustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.company.dataasset.entity.Customer">
+        <id column="id" property="id" />
+        <result column="customer_code" property="customerCode" />
+        <result column="company_name" property="companyName" />
+        <result column="company_short_name" property="companyShortName" />
+        <result column="industry" property="industry" />
+        <result column="company_scale" property="companyScale" />
+        <result column="business_license" property="businessLicense" />
+        <result column="legal_representative" property="legalRepresentative" />
+        <result column="registered_capital" property="registeredCapital" />
+        <result column="establishment_date" property="establishmentDate" />
+        <result column="registered_address" property="registeredAddress" />
+        <result column="office_address" property="officeAddress" />
+        <result column="contact_name" property="contactName" />
+        <result column="contact_phone" property="contactPhone" />
+        <result column="contact_email" property="contactEmail" />
+        <result column="contact_position" property="contactPosition" />
+        <result column="company_website" property="companyWebsite" />
+        <result column="company_introduction" property="companyIntroduction" />
+        <result column="business_scope" property="businessScope" />
+        <result column="status" property="status" />
+        <result column="manager_id" property="managerId" />
+        <result column="source" property="source" />
+        <result column="remark" property="remark" />
+        <result column="created_by" property="createdBy" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, customer_code, company_name, company_short_name, industry, company_scale,
+        business_license, legal_representative, registered_capital, establishment_date,
+        registered_address, office_address, contact_name, contact_phone, contact_email,
+        contact_position, company_website, company_introduction, business_scope,
+        status, manager_id, source, remark, created_by, created_at, updated_by,
+        updated_at, deleted
+    </sql>
+
+    <!-- 根据客户编码查询 -->
+    <select id="selectByCustomerCode" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM customer
+        WHERE customer_code = #{customerCode}
+        AND deleted = 0
+    </select>
+
+    <!-- 根据公司名称查询 -->
+    <select id="selectByCompanyName" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM customer
+        WHERE company_name LIKE CONCAT('%', #{companyName}, '%')
+        AND deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据行业查询 -->
+    <select id="selectByIndustry" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM customer
+        WHERE industry = #{industry}
+        AND deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 查询所有有效客户 -->
+    <select id="selectAllActive" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM customer
+        WHERE status = 1
+        AND deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 分页查询客户列表 -->
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM customer
+        WHERE deleted = 0
+        <if test="companyName != null and companyName != ''">
+            AND company_name LIKE CONCAT('%', #{companyName}, '%')
+        </if>
+        <if test="industry != null and industry != ''">
+            AND industry = #{industry}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 生成客户编码 -->
+    <select id="generateCustomerCode" resultType="java.lang.String">
+        SELECT CONCAT('C', DATE_FORMAT(NOW(), '%Y%m'), LPAD(COUNT(*) + 1, 4, '0'))
+        FROM customer
+        WHERE DATE_FORMAT(created_at, '%Y%m') = DATE_FORMAT(NOW(), '%Y%m')
+    </select>
+
+    <!-- 检查公司名称是否已存在 -->
+    <select id="existsByCompanyName" resultType="java.lang.Boolean">
+        SELECT COUNT(*) > 0
+        FROM customer
+        WHERE company_name = #{companyName}
+        AND deleted = 0
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <!-- 检查营业执照号是否已存在 -->
+    <select id="existsByBusinessLicense" resultType="java.lang.Boolean">
+        SELECT COUNT(*) > 0
+        FROM customer
+        WHERE business_license = #{businessLicense}
+        AND deleted = 0
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <!-- 逻辑删除客户 -->
+    <update id="deleteById">
+        UPDATE customer
+        SET deleted = 1,
+            updated_at = NOW(),
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+    <!-- 更新客户状态 -->
+    <update id="updateStatus">
+        UPDATE customer
+        SET status = #{status},
+            updated_at = NOW(),
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+    <!-- 获取客户统计信息 -->
+    <select id="getCustomerStats" resultType="java.util.Map">
+        SELECT
+            COUNT(*) as total_count,
+            SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as active_count,
+            SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as inactive_count,
+            COUNT(DISTINCT industry) as industry_count
+        FROM customer
+        WHERE deleted = 0
+    </select>
+
+</mapper>
