@@ -1,66 +1,52 @@
-# Java
-*.class
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.log
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# Maven
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
-
-# IDE
-.idea/
-*.iml
-*.iws
-*.ipr
-.vscode/
-.settings/
-.classpath
-.project
-.DS_Store
-
-# Node.js
+# Node
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
-
-# Logs
-logs/
-*.log
-log/
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Build output
+pnpm-debug.log*
+.pnpm-debug.log*
 dist/
-build/
-out/
-bin/
+dist-ssr/
+*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
 
 # Database
 *.db
@@ -68,62 +54,37 @@ bin/
 *.sqlite3
 
 # Docker
-docker-compose.override.yml
+.dockerignore
 
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.swp
-*~
+# Logs
+logs/
+*.log
 
-# OS generated files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
+# Environment
+.env
+.env.local
+.env.*.local
 
-# Test coverage
+# Coverage
+htmlcov/
+.tox/
 .coverage
 .coverage.*
-htmlcov/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 .pytest_cache/
-.tox/
 
-# Documentation
-_site/
-.sass-cache/
-.jekyll-cache/
-.jekyll-metadata
+# Uploads
+uploads/
+temp/
+tmp/
 
-# Backup files
+# MinIO data
+minio_data/
+
+# Backup
+*.bak
 *.backup
-*.orig
-
-# IDE specific
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/dictionaries
-.idea/vcs.xml
-.idea/jsLibraryMappings.xml
-.idea/dataSources.ids
-.idea/dataSources.xml
-.idea/sqlDataSources.xml
-.idea/dynamic.xml
-.idea/uiDesigner.xml
-
-# Spring Boot
-!src/main/resources/application.yml
-!src/main/resources/application-*.yml
-
-# MyBatis
-!src/main/resources/mapper/*.xml
-
-# Database scripts
-!src/main/resources/db/*.sql
-
-# Application specific
-/uploads/
-/temp/
-/templates/
-/reports/
-/logs/

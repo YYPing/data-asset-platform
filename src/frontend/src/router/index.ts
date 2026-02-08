@@ -12,6 +12,16 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: false,
     },
   },
+  // 数据大屏（独立布局，无需认证）
+  {
+    path: '/screen',
+    name: 'DataScreen',
+    component: () => import('@/views/screen/index.vue'),
+    meta: {
+      title: '数据资产大屏',
+      requiresAuth: false,
+    },
+  },
   {
     path: '/',
     name: 'Layout',
@@ -31,72 +41,192 @@ const routes: RouteRecordRaw[] = [
           requiresAuth: true,
         },
       },
+      // 资产管理
       {
         path: '/assets',
         name: 'Assets',
-        component: () => import('@/views/placeholder.vue'),
+        redirect: '/assets/list',
         meta: {
           title: '资产管理',
           icon: 'Box',
           requiresAuth: true,
-          roles: ['holder_admin', 'holder_user', 'center_admin', 'center_user'],
+          roles: ['admin', 'asset_manager', 'viewer'],
         },
+        children: [
+          {
+            path: '/assets/list',
+            name: 'AssetList',
+            component: () => import('@/views/assets/list.vue'),
+            meta: {
+              title: '资产列表',
+              requiresAuth: true,
+            },
+          },
+          {
+            path: '/assets/create',
+            name: 'AssetCreate',
+            component: () => import('@/views/assets/create.vue'),
+            meta: {
+              title: '新建资产',
+              requiresAuth: true,
+              roles: ['admin', 'asset_manager'],
+            },
+          },
+          {
+            path: '/assets/:id',
+            name: 'AssetDetail',
+            component: () => import('@/views/assets/detail.vue'),
+            meta: {
+              title: '资产详情',
+              requiresAuth: true,
+            },
+          },
+          {
+            path: '/assets/:id/edit',
+            name: 'AssetEdit',
+            component: () => import('@/views/assets/edit.vue'),
+            meta: {
+              title: '编辑资产',
+              requiresAuth: true,
+              roles: ['admin', 'asset_manager'],
+            },
+          },
+        ],
       },
+      // 材料管理
       {
         path: '/materials',
         name: 'Materials',
-        component: () => import('@/views/placeholder.vue'),
+        component: () => import('@/views/materials/index.vue'),
         meta: {
           title: '材料管理',
           icon: 'Document',
           requiresAuth: true,
-          roles: ['holder_admin', 'holder_user'],
+          roles: ['admin', 'asset_manager'],
         },
       },
+      // 证书管理
+      {
+        path: '/certificates',
+        name: 'Certificates',
+        component: () => import('@/views/certificates/index.vue'),
+        meta: {
+          title: '证书管理',
+          icon: 'Stamp',
+          requiresAuth: true,
+          roles: ['admin', 'asset_manager'],
+        },
+      },
+      // 工作流管理
       {
         path: '/workflow',
         name: 'Workflow',
-        component: () => import('@/views/placeholder.vue'),
+        redirect: '/workflow/instances',
         meta: {
-          title: '审批管理',
+          title: '工作流',
           icon: 'CircleCheck',
           requiresAuth: true,
-          roles: ['center_admin', 'center_user'],
+          roles: ['admin', 'asset_manager', 'evaluator'],
         },
+        children: [
+          {
+            path: '/workflow/instances',
+            name: 'WorkflowInstances',
+            component: () => import('@/views/workflow/instances.vue'),
+            meta: {
+              title: '流程实例',
+              requiresAuth: true,
+            },
+          },
+          {
+            path: '/workflow/definitions',
+            name: 'WorkflowDefinitions',
+            component: () => import('@/views/workflow/definitions.vue'),
+            meta: {
+              title: '流程定义',
+              requiresAuth: true,
+              roles: ['admin'],
+            },
+          },
+          {
+            path: '/workflow/tasks',
+            name: 'WorkflowTasks',
+            component: () => import('@/views/workflow/tasks.vue'),
+            meta: {
+              title: '待办任务',
+              requiresAuth: true,
+            },
+          },
+        ],
       },
+      // 评估管理
       {
         path: '/assessment',
         name: 'Assessment',
-        component: () => import('@/views/placeholder.vue'),
+        redirect: '/assessment/records',
         meta: {
           title: '评估管理',
           icon: 'DataAnalysis',
           requiresAuth: true,
-          roles: ['evaluator', 'center_admin'],
+          roles: ['admin', 'evaluator'],
         },
+        children: [
+          {
+            path: '/assessment/records',
+            name: 'AssessmentRecords',
+            component: () => import('@/views/assessment/records.vue'),
+            meta: {
+              title: '评估记录',
+              requiresAuth: true,
+            },
+          },
+          {
+            path: '/assessment/templates',
+            name: 'AssessmentTemplates',
+            component: () => import('@/views/assessment/templates.vue'),
+            meta: {
+              title: '评估模板',
+              requiresAuth: true,
+              roles: ['admin'],
+            },
+          },
+        ],
       },
+      // 统计分析
       {
         path: '/statistics',
         name: 'Statistics',
-        component: () => import('@/views/placeholder.vue'),
+        component: () => import('@/views/statistics/index.vue'),
         meta: {
           title: '统计分析',
           icon: 'TrendCharts',
           requiresAuth: true,
-          roles: ['center_admin', 'center_user', 'auditor'],
         },
       },
+      // 审计日志
       {
         path: '/audit',
         name: 'Audit',
-        component: () => import('@/views/placeholder.vue'),
+        component: () => import('@/views/audit/index.vue'),
         meta: {
           title: '审计日志',
           icon: 'List',
           requiresAuth: true,
-          roles: ['auditor', 'sys_admin'],
+          roles: ['admin'],
         },
       },
+      // 通知中心
+      {
+        path: '/notifications',
+        name: 'Notifications',
+        component: () => import('@/views/notifications/index.vue'),
+        meta: {
+          title: '通知中心',
+          icon: 'Bell',
+          requiresAuth: true,
+        },
+      },
+      // 系统管理
       {
         path: '/system',
         name: 'System',
@@ -105,54 +235,75 @@ const routes: RouteRecordRaw[] = [
           title: '系统管理',
           icon: 'Setting',
           requiresAuth: true,
-          roles: ['sys_admin'],
+          roles: ['admin'],
         },
         children: [
           {
             path: '/system/users',
             name: 'SystemUsers',
-            component: () => import('@/views/placeholder.vue'),
+            component: () => import('@/views/system/users.vue'),
             meta: {
               title: '用户管理',
               icon: 'User',
               requiresAuth: true,
-              roles: ['sys_admin'],
+              roles: ['admin'],
             },
           },
           {
-            path: '/system/roles',
-            name: 'SystemRoles',
-            component: () => import('@/views/placeholder.vue'),
+            path: '/system/organizations',
+            name: 'SystemOrganizations',
+            component: () => import('@/views/system/organizations.vue'),
             meta: {
-              title: '角色管理',
-              icon: 'UserFilled',
+              title: '机构管理',
+              icon: 'OfficeBuilding',
               requiresAuth: true,
-              roles: ['sys_admin'],
+              roles: ['admin'],
             },
           },
           {
             path: '/system/dict',
             name: 'SystemDict',
-            component: () => import('@/views/placeholder.vue'),
+            component: () => import('@/views/system/dict.vue'),
             meta: {
               title: '数据字典',
               icon: 'Collection',
               requiresAuth: true,
-              roles: ['sys_admin'],
+              roles: ['admin'],
             },
           },
           {
             path: '/system/config',
             name: 'SystemConfig',
-            component: () => import('@/views/placeholder.vue'),
+            component: () => import('@/views/system/config.vue'),
             meta: {
               title: '系统配置',
               icon: 'Tools',
               requiresAuth: true,
-              roles: ['sys_admin'],
+              roles: ['admin'],
+            },
+          },
+          {
+            path: '/system/jobs',
+            name: 'SystemJobs',
+            component: () => import('@/views/system/jobs.vue'),
+            meta: {
+              title: '定时任务',
+              icon: 'Timer',
+              requiresAuth: true,
+              roles: ['admin'],
             },
           },
         ],
+      },
+      // 个人中心
+      {
+        path: '/profile',
+        name: 'Profile',
+        component: () => import('@/views/profile/index.vue'),
+        meta: {
+          title: '个人中心',
+          requiresAuth: true,
+        },
       },
     ],
   },

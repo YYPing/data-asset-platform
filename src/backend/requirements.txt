@@ -1,16 +1,67 @@
+# Data Asset Management Platform - Backend Dependencies
+
+# FastAPI and ASGI server
 fastapi==0.115.0
-uvicorn[standard]==0.30.0
+uvicorn[standard]==0.32.0
+python-multipart==0.0.12
+
+# Database
 sqlalchemy[asyncio]==2.0.35
-asyncpg==0.30.0
-pydantic==2.10.0
+asyncpg==0.29.0
+alembic==1.13.3
+
+# Pydantic for data validation
+pydantic>=2.0.0,<3.0.0
 pydantic-settings==2.6.0
+email-validator==2.2.0
+
+# Authentication and security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.12
-minio==7.2.12
+
+# Redis for caching and session
 redis==5.2.0
+hiredis==3.0.0
+
+# MinIO for object storage
+minio==7.2.9
+
+# Task scheduling
 apscheduler==3.10.4
-httpx==0.27.0
-pytest==8.3.0
+
+# File handling
+aiofiles==24.1.0
+python-magic==0.4.27
+
+# HTTP client
+httpx==0.27.2
+aiohttp==3.11.2
+
+# Excel processing
+openpyxl==3.1.5
+xlrd==2.0.1
+
+# PDF processing
+pypdf2==3.0.1
+
+# Date and time
+python-dateutil==2.9.0
+
+# Utilities
+python-dotenv==1.0.1
+pyyaml==6.0.2
+
+# Logging
+loguru==0.7.2
+
+# Testing (optional, for development)
+pytest==8.3.3
 pytest-asyncio==0.24.0
-locust==2.32.0
+pytest-cov==6.0.0
+httpx==0.27.2
+
+# Code quality (optional, for development)
+black==24.10.0
+flake8==7.1.1
+mypy==1.13.0
