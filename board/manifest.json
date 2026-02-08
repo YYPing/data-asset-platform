@@ -1,0 +1,138 @@
+{
+  "project": "数据资产全流程管理平台",
+  "version": "0.1.0",
+  "created_at": "2026-02-08T22:04:00",
+  "updated_at": "2026-02-08T22:15:00",
+  "status": "in_progress",
+  "total_code_lines": 4311,
+  "batches": [
+    {
+      "id": "batch-0",
+      "name": "Phase 0: 项目骨架初始化",
+      "status": "completed",
+      "completed_at": "2026-02-08T22:05:00",
+      "tasks": [
+        {"id": "init-project", "name": "项目目录结构+骨架代码", "status": "completed", "agent": "贾维斯(直接)", "files_count": 17}
+      ]
+    },
+    {
+      "id": "batch-1",
+      "name": "批次1: 数据层+认证+前端骨架",
+      "status": "completed",
+      "started_at": "2026-02-08T22:05:00",
+      "completed_at": "2026-02-08T22:09:00",
+      "tasks": [
+        {
+          "id": "batch1-db-models",
+          "name": "17张表SQLAlchemy模型",
+          "agent_role": "architect",
+          "model": "sonnet",
+          "status": "completed",
+          "runtime": "1m38s",
+          "output_files": [
+            "src/backend/app/models/base.py (30行)",
+            "src/backend/app/models/user.py (137行)",
+            "src/backend/app/models/asset.py (166行)",
+            "src/backend/app/models/workflow.py (147行)",
+            "src/backend/app/models/assessment.py (54行)",
+            "src/backend/app/models/system.py (161行)",
+            "src/backend/app/models/__init__.py"
+          ],
+          "summary": "17个模型全部完成，SQLAlchemy 2.0新语法，完整relationship"
+        },
+        {
+          "id": "batch1-auth",
+          "name": "JWT认证+RBAC权限",
+          "agent_role": "backend-dev",
+          "model": "sonnet",
+          "status": "completed",
+          "runtime": "2m44s",
+          "output_files": [
+            "src/backend/app/core/security.py (365行)",
+            "src/backend/app/core/permissions.py (380行)",
+            "src/backend/app/schemas/auth.py (214行)",
+            "src/backend/app/services/auth.py (550行)",
+            "src/backend/app/api/v1/auth.py (323行)"
+          ],
+          "summary": "JWT双Token+bcrypt+Redis黑名单+7角色RBAC+数据权限过滤"
+        },
+        {
+          "id": "batch1-frontend-base",
+          "name": "前端框架+登录+布局",
+          "agent_role": "frontend-dev",
+          "model": "sonnet",
+          "status": "completed",
+          "runtime": "2m39s",
+          "output_files": [
+            "src/frontend/src/main.ts (25行)",
+            "src/frontend/src/App.vue (33行)",
+            "src/frontend/src/api/request.ts (139行)",
+            "src/frontend/src/api/auth.ts (57行)",
+            "src/frontend/src/stores/user.ts (171行)",
+            "src/frontend/src/router/index.ts (214行)",
+            "src/frontend/src/views/login/index.vue (241行)",
+            "src/frontend/src/views/layout/index.vue (368行)",
+            "src/frontend/src/views/dashboard/index.vue (359行)",
+            "src/frontend/src/utils/permission.ts (76行)",
+            "src/frontend/src/views/placeholder.vue (28行)"
+          ],
+          "summary": "Vue3+TS+ElementPlus+Pinia，登录页+主布局+仪表盘+路由守卫+权限控制"
+        }
+      ]
+    },
+    {
+      "id": "batch-2",
+      "name": "批次2: 核心业务模块（资产+材料+证书+资产页面）",
+      "status": "pending",
+      "tasks": [
+        {"id": "batch2-asset-api", "name": "数据资产CRUD+搜索API", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch2-material-api", "name": "材料上传+哈希存证+MinIO", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch2-cert-api", "name": "登记证书导入+有效期管理", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch2-asset-ui", "name": "资产列表+详情+表单+材料上传页面", "agent_role": "frontend-dev", "model": "sonnet", "status": "pending"}
+      ]
+    },
+    {
+      "id": "batch-3",
+      "name": "批次3: 工作流+评估",
+      "status": "pending",
+      "tasks": [
+        {"id": "batch3-wf-engine", "name": "工作流引擎（状态机+并行审批+超时）", "agent_role": "architect", "model": "opus", "status": "pending"},
+        {"id": "batch3-wf-api", "name": "工作流API+审批接口", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch3-assess-api", "name": "合规评估+价值评估API", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch3-wf-ui", "name": "审批页面+流程可视化+待办列表", "agent_role": "frontend-dev", "model": "sonnet", "status": "pending"}
+      ]
+    },
+    {
+      "id": "batch-4",
+      "name": "批次4: 辅助模块（审计+通知+统计+定时任务）",
+      "status": "pending",
+      "tasks": [
+        {"id": "batch4-audit-api", "name": "审计日志+分区管理", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch4-notify-api", "name": "通知系统+站内信", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch4-stats-api", "name": "统计接口+物化视图", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch4-scheduler", "name": "APScheduler定时任务+异步作业", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"}
+      ]
+    },
+    {
+      "id": "batch-5",
+      "name": "批次5: 大屏+系统管理+测试",
+      "status": "pending",
+      "tasks": [
+        {"id": "batch5-dashboard-holder", "name": "持有方大屏", "agent_role": "frontend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch5-dashboard-center", "name": "登记中心大屏", "agent_role": "frontend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch5-system-ui", "name": "系统管理页面（用户/角色/字典/配置）", "agent_role": "frontend-dev", "model": "sonnet", "status": "pending"},
+        {"id": "batch5-tests", "name": "核心模块单元测试+接口测试", "agent_role": "tester", "model": "sonnet", "status": "pending"}
+      ]
+    },
+    {
+      "id": "batch-6",
+      "name": "Phase 2: 集成+部署+优化",
+      "status": "pending",
+      "tasks": [
+        {"id": "phase2-integration", "name": "模块集成+冲突解决", "agent_role": "贾维斯", "status": "pending"},
+        {"id": "phase2-docker", "name": "Docker Compose生产版+Nginx+监控", "agent_role": "贾维斯", "status": "pending"},
+        {"id": "phase2-security", "name": "安全加固验证", "agent_role": "backend-dev", "model": "sonnet", "status": "pending"}
+      ]
+    }
+  ]
+}
