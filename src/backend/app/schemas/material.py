@@ -6,6 +6,9 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, Field, field_validator
 
+# 导入基础响应类
+from app.schemas.base import ApiResponse
+
 
 # ==================== 基础模型 ====================
 
@@ -280,3 +283,22 @@ class MaterialDownloadResponse(BaseModel):
     file_name: str = Field(..., description="文件名")
     download_url: str = Field(..., description="下载URL（预签名URL）")
     expires_in: int = Field(..., description="URL有效期（秒）")
+
+
+class MaterialChecklistItem(BaseModel):
+    """材料清单项模型"""
+    material_name: str = Field(..., description="材料名称")
+    material_type: str = Field(..., description="材料类型")
+    is_required: bool = Field(..., description="是否必需")
+    is_completed: bool = Field(..., description="是否已完成")
+    completed_at: Optional[datetime] = Field(None, description="完成时间")
+
+
+class MaterialChecklistResponse(BaseModel):
+    """材料清单响应模型"""
+    stage: str = Field(..., description="阶段名称")
+    items: List[MaterialChecklistItem] = Field(default_factory=list, description="材料清单项列表")
+    required_count: int = Field(..., description="必需材料总数")
+    completed_count: int = Field(..., description="已完成材料数")
+    progress: float = Field(..., description="完成进度（0-1）")
+    is_complete: bool = Field(..., description="是否完成")

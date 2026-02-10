@@ -18,7 +18,7 @@ from app.schemas.auth import (
 )
 from app.models.user import User
 from app.core.security import get_current_user, get_current_active_user
-from app.db.session import get_db
+from app.core.database import get_db
 from app.services import auth as auth_service
 
 

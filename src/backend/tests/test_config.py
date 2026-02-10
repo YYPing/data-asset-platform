@@ -11,9 +11,9 @@ TEST_CONFIG: Dict[str, Any] = {
     "DATABASE_URL": "sqlite+aiosqlite:///:memory:",
     "DATABASE_ECHO": False,
     
-    # Redis配置 - 使用内存模拟
-    "REDIS_URL": "memory://",
-    "REDIS_ENABLED": False,
+    # Redis配置 - 使用Redis mock
+    "REDIS_URL": "redis://mock:6379/0",
+    "REDIS_ENABLED": True,
     
     # JWT配置
     "SECRET_KEY": "test-secret-key-for-testing-only-change-in-production",

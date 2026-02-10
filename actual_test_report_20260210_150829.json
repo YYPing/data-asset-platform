@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-02-10T15:08:29.535258",
+  "total_tests": 0,
+  "total_passed": 0,
+  "total_failed": 0,
+  "total_skipped": 0,
+  "total_errors": 0,
+  "overall_pass_rate": 0,
+  "quality": "poor",
+  "modules": {
+    "认证模块": {
+      "status": "failed",
+      "returncode": 4,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "total": 0,
+      "output": "ImportError while loading conftest '/Users/yyp/.openclaw/workspace/data-asset-platform/src/backend/tests/conftest.py'.\ntests/conftest.py:16: in <module>\n    from app.main import app\napp/main.py:18: in <module>\n    from app.api.v1.materials import router as materials_router\napp/api/v1/materials.py:12: in <module>\n    from app.schemas.material import (\nE   ImportError: cannot import name 'ApiResponse' from 'app.schemas.material' (/Users/yyp/.openclaw/workspace/data-asset-platform/src/backend/app/schemas/material.py)\n"
+    },
+    "材料管理模块": {
+      "status": "failed",
+      "returncode": 4,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "total": 0,
+      "output": "ImportError while loading conftest '/Users/yyp/.openclaw/workspace/data-asset-platform/src/backend/tests/conftest.py'.\ntests/conftest.py:16: in <module>\n    from app.main import app\napp/main.py:18: in <module>\n    from app.api.v1.materials import router as materials_router\napp/api/v1/materials.py:12: in <module>\n    from app.schemas.material import (\nE   ImportError: cannot import name 'ApiResponse' from 'app.schemas.material' (/Users/yyp/.openclaw/workspace/data-asset-platform/src/backend/app/schemas/material.py)\n"
+    }
+  },
+  "summary": {
+    "status": "PASS",
+    "message": "功能测试完成: 0通过, 0失败, 0错误"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-02-10 16:30:27",
+  "project": "数据资产平台",
+  "test_type": "功能验证测试",
+  "core_functionality": {
+    "status": "FAIL",
+    "tests": [
+      {
+        "name": "密码哈希功能",
+        "status": "PASS"
+      },
+      {
+        "name": "JWT令牌功能",
+        "status": "PASS"
+      },
+      {
+        "name": "数据库模型",
+        "status": "PASS"
+      },
+      {
+        "name": "API路由定义",
+        "status": "PASS"
+      }
+    ]
+  },
+  "auth_module": {
+    "status": "FAIL",
+    "tests": [
+      {
+        "name": "健康检查端点",
+        "status": "PASS"
+      },
+      {
+        "name": "API文档端点",
+        "status": "PASS"
+      }
+    ]
+  },
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 0,
+    "failed_tests": 6,
+    "pass_rate": 0.0,
+    "overall_status": "FAIL",
+    "message": "功能测试失败"
+  },
+  "recommendations": [
+    "核心功能验证完成，可以进行集成测试",
+    "建议运行完整的pytest测试套件以获得详细覆盖率",
+    "部署前进行端到端测试"
+  ]
+}

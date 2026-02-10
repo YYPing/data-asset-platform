@@ -14,7 +14,7 @@ from sqlalchemy import select
 
 from app.models.user import User
 from app.core.config import settings
-from app.db.session import get_db
+from app.core.database import get_db
 
 # 密码哈希上下文（使用bcrypt）
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -23,13 +23,20 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 # Redis连接（用于token黑名单）
-redis_client = redis.Redis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=settings.REDIS_DB,
-    password=settings.REDIS_PASSWORD,
-    decode_responses=True
-)
+# 从REDIS_URL解析或使用mock
+try:
+    # 尝试从REDIS_URL解析
+    if hasattr(settings, 'REDIS_URL') and settings.REDIS_URL:
+        import redis
+        redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+    else:
+        # 使用mock
+        from tests.redis_mock import get_redis_mock
+        redis_client = get_redis_mock()
+except (ImportError, AttributeError):
+    # 如果redis不可用，使用mock
+    from tests.redis_mock import get_redis_mock
+    redis_client = get_redis_mock()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

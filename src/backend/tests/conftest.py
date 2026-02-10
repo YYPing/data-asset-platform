@@ -2,6 +2,7 @@
 测试配置文件
 """
 import os
+import sys
 from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
@@ -9,9 +10,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+# 添加当前目录到Python路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from app.main import app
 from app.database import Base, get_db
 from app.core.security import create_access_token
+
+# 导入Redis mock
+from tests.redis_mock import get_redis_mock
 
 # 使用内存SQLite数据库进行测试
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -45,10 +52,17 @@ def client(db) -> Generator:
         finally:
             pass
     
+    # 覆盖Redis依赖
+    import app.core.security as security_module
+    security_module.redis_client = get_redis_mock()
+    
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+    
+    # 清理Redis mock
+    security_module.redis_client = None
 
 
 @pytest.fixture
