@@ -1,0 +1,382 @@
+{
+  "project": "数据资产全流程管理平台",
+  "report_date": "2026-02-10 12:02:53",
+  "duration": "0:00:00.014264",
+  "summary": {
+    "total_modules": 5,
+    "total_test_files": 6,
+    "total_test_cases": 51,
+    "total_source_files": 24,
+    "total_source_lines": 9879,
+    "average_test_coverage": 27.7
+  },
+  "modules": {
+    "auth": {
+      "module_name": "认证与权限模块",
+      "description": "用户注册、登录、Token验证、权限控制、安全功能",
+      "analysis_time": "2026-02-10T12:02:53.692330",
+      "test_files": {
+        "tests/test_auth.py": {
+          "status": "exists",
+          "lines": 314,
+          "size_kb": 9.43,
+          "test_cases": [
+            "test_login_success",
+            "test_login_wrong_password",
+            "test_login_nonexistent_user",
+            "test_get_current_user",
+            "test_access_without_token",
+            "test_access_with_invalid_token",
+            "test_refresh_token",
+            "test_admin_can_access_all",
+            "test_viewer_cannot_create_asset",
+            "test_manager_can_create_asset",
+            "test_weak_password_rejected",
+            "test_strong_password_accepted"
+          ],
+          "test_classes": [
+            "TestAuth",
+            "TestPermissions",
+            "TestPasswordSecurity"
+          ],
+          "test_case_count": 12,
+          "test_class_count": 3
+        },
+        "tests/test_auth_comprehensive.py": {
+          "status": "exists",
+          "lines": 462,
+          "size_kb": 15.49,
+          "test_cases": [
+            "test_register_success",
+            "test_register_duplicate_username",
+            "test_register_weak_password",
+            "test_login_success",
+            "test_login_wrong_password",
+            "test_login_nonexistent_user",
+            "test_token_validation",
+            "test_invalid_token",
+            "test_missing_token",
+            "test_token_refresh",
+            "test_change_password",
+            "test_change_password_wrong_old",
+            "test_admin_permissions",
+            "test_holder_permissions",
+            "test_get_current_user",
+            "test_logout",
+            "test_password_policy",
+            "test_empty_credentials",
+            "test_long_inputs",
+            "test_login_performance",
+            "test_malformed_json",
+            "test_wrong_content_type"
+          ],
+          "test_classes": [
+            "TestAuthComprehensive"
+          ],
+          "test_case_count": 22,
+          "test_class_count": 1
+        }
+      },
+      "source_files": {
+        "source_files": [
+          {
+            "path": "app/core/security.py",
+            "lines": 366,
+            "size_kb": 9.46,
+            "type": "file"
+          },
+          {
+            "path": "app/core/__init__.py",
+            "lines": 1,
+            "size_kb": 0.0,
+            "type": "file"
+          },
+          {
+            "path": "app/core/permissions.py",
+            "lines": 381,
+            "size_kb": 11.39,
+            "type": "file"
+          },
+          {
+            "path": "app/models/user.py",
+            "lines": 386,
+            "size_kb": 11.61,
+            "type": "file"
+          },
+          {
+            "path": "app/api/v1/auth.py",
+            "lines": 324,
+            "size_kb": 8.05,
+            "type": "file"
+          },
+          {
+            "path": "app/services/auth.py",
+            "lines": 551,
+            "size_kb": 14.79,
+            "type": "file"
+          }
+        ],
+        "total_files": 6,
+        "total_lines": 2009,
+        "total_size_kb": 55.3
+      },
+      "summary": {
+        "test_file_count": 2,
+        "total_test_cases": 34,
+        "source_file_count": 6,
+        "source_lines": 2009,
+        "estimated_test_coverage": 84.6,
+        "status": "analyzed"
+      }
+    },
+    "assets": {
+      "module_name": "数据资产管理模块",
+      "description": "资产CRUD、版本控制、状态流转、搜索功能、审计日志",
+      "analysis_time": "2026-02-10T12:02:53.696611",
+      "test_files": {
+        "tests/test_assets.py": {
+          "status": "exists",
+          "lines": 443,
+          "size_kb": 13.68,
+          "test_cases": [
+            "test_create_asset",
+            "test_get_asset_list",
+            "test_get_asset_detail",
+            "test_update_asset",
+            "test_delete_asset",
+            "test_search_by_keyword",
+            "test_filter_by_status",
+            "test_pagination",
+            "test_create_asset_missing_required_fields",
+            "test_create_asset_invalid_classification"
+          ],
+          "test_classes": [
+            "TestAssetCRUD",
+            "TestAssetSearch",
+            "TestAssetValidation"
+          ],
+          "test_case_count": 10,
+          "test_class_count": 3
+        }
+      },
+      "source_files": {
+        "source_files": [
+          {
+            "path": "app/models/asset.py",
+            "lines": 566,
+            "size_kb": 16.42,
+            "type": "file"
+          },
+          {
+            "path": "app/api/v1/assets.py",
+            "lines": 553,
+            "size_kb": 14.92,
+            "type": "file"
+          },
+          {
+            "path": "app/services/asset.py",
+            "lines": 855,
+            "size_kb": 28.29,
+            "type": "file"
+          },
+          {
+            "path": "app/utils/search.py",
+            "lines": 300,
+            "size_kb": 9.71,
+            "type": "file"
+          },
+          {
+            "path": "app/utils/audit.py",
+            "lines": 322,
+            "size_kb": 9.57,
+            "type": "file"
+          }
+        ],
+        "total_files": 5,
+        "total_lines": 2596,
+        "total_size_kb": 78.92
+      },
+      "summary": {
+        "test_file_count": 1,
+        "total_test_cases": 10,
+        "source_file_count": 5,
+        "source_lines": 2596,
+        "estimated_test_coverage": 19.3,
+        "status": "analyzed"
+      }
+    },
+    "workflow": {
+      "module_name": "工作流管理模块",
+      "description": "审批流程、任务分配、状态机管理、通知提醒",
+      "analysis_time": "2026-02-10T12:02:53.699780",
+      "test_files": {
+        "tests/test_workflow.py": {
+          "status": "exists",
+          "lines": 399,
+          "size_kb": 12.16,
+          "test_cases": [
+            "test_create_workflow_instance",
+            "test_get_workflow_list",
+            "test_approve_workflow",
+            "test_reject_workflow",
+            "test_workflow_without_permission",
+            "test_workflow_state_machine",
+            "test_invalid_state_transition"
+          ],
+          "test_classes": [
+            "TestWorkflowBasic",
+            "TestWorkflowApproval",
+            "TestWorkflowStateTransition"
+          ],
+          "test_case_count": 7,
+          "test_class_count": 3
+        }
+      },
+      "source_files": {
+        "source_files": [
+          {
+            "path": "app/models/workflow.py",
+            "lines": 489,
+            "size_kb": 13.91,
+            "type": "file"
+          },
+          {
+            "path": "app/api/v1/workflow.py",
+            "lines": 519,
+            "size_kb": 16.46,
+            "type": "file"
+          }
+        ],
+        "total_files": 2,
+        "total_lines": 1008,
+        "total_size_kb": 30.38
+      },
+      "summary": {
+        "test_file_count": 1,
+        "total_test_cases": 7,
+        "source_file_count": 2,
+        "source_lines": 1008,
+        "estimated_test_coverage": 34.7,
+        "status": "analyzed"
+      }
+    },
+    "materials": {
+      "module_name": "材料管理模块",
+      "description": "材料上传、哈希存证、版本管理、MinIO集成",
+      "analysis_time": "2026-02-10T12:02:53.701765",
+      "test_files": {
+        "tests/test_materials.py": {
+          "status": "missing",
+          "message": "测试文件不存在"
+        }
+      },
+      "source_files": {
+        "source_files": [
+          {
+            "path": "app/api/v1/materials.py",
+            "lines": 247,
+            "size_kb": 7.59,
+            "type": "file"
+          },
+          {
+            "path": "app/services/material.py",
+            "lines": 577,
+            "size_kb": 16.71,
+            "type": "file"
+          },
+          {
+            "path": "app/utils/minio_client.py",
+            "lines": 459,
+            "size_kb": 12.09,
+            "type": "file"
+          },
+          {
+            "path": "app/utils/file_hash.py",
+            "lines": 191,
+            "size_kb": 4.71,
+            "type": "file"
+          }
+        ],
+        "total_files": 4,
+        "total_lines": 1474,
+        "total_size_kb": 41.1
+      },
+      "summary": {
+        "test_file_count": 1,
+        "total_test_cases": 0,
+        "source_file_count": 4,
+        "source_lines": 1474,
+        "estimated_test_coverage": 0.0,
+        "status": "analyzed"
+      }
+    },
+    "certificates": {
+      "module_name": "证书管理模块",
+      "description": "证书导入、OCR识别、有效期管理、证书验证",
+      "analysis_time": "2026-02-10T12:02:53.704484",
+      "test_files": {
+        "tests/test_certificates.py": {
+          "status": "missing",
+          "message": "测试文件不存在"
+        }
+      },
+      "source_files": {
+        "source_files": [
+          {
+            "path": "app/models/certificate.py",
+            "lines": 685,
+            "size_kb": 18.77,
+            "type": "file"
+          },
+          {
+            "path": "app/api/v1/certificates.py",
+            "lines": 222,
+            "size_kb": 6.5,
+            "type": "file"
+          },
+          {
+            "path": "app/services/certificate.py",
+            "lines": 310,
+            "size_kb": 11.02,
+            "type": "file"
+          },
+          {
+            "path": "app/utils/ocr_processor.py",
+            "lines": 362,
+            "size_kb": 11.06,
+            "type": "file"
+          },
+          {
+            "path": "app/utils/certificate_parser.py",
+            "lines": 428,
+            "size_kb": 13.71,
+            "type": "file"
+          },
+          {
+            "path": "app/utils/expiry_manager.py",
+            "lines": 371,
+            "size_kb": 10.93,
+            "type": "file"
+          },
+          {
+            "path": "app/utils/certificate_validator.py",
+            "lines": 414,
+            "size_kb": 13.57,
+            "type": "file"
+          }
+        ],
+        "total_files": 7,
+        "total_lines": 2792,
+        "total_size_kb": 85.55
+      },
+      "summary": {
+        "test_file_count": 1,
+        "total_test_cases": 0,
+        "source_file_count": 7,
+        "source_lines": 2792,
+        "estimated_test_coverage": 0.0,
+        "status": "analyzed"
+      }
+    }
+  }
+}

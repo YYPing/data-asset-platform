@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>材料管理系统 - 演示</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #1890ff;
+    }
+
+    h2 {
+      color: #666;
+      margin: 30px 0 15px;
+      font-size: 18px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    /* 文件上传样式 */
+    .file-uploader {
+      padding: 20px;
+      border: 2px dashed #d9d9d9;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .file-uploader input[type="file"] {
+      margin-bottom: 15px;
+    }
+
+    .progress-container {
+      margin: 20px 0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #f0f0f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1890ff, #52c41a);
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* 按钮样式 */
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 0 5px;
+      transition: all 0.3s;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button:not(:disabled):hover {
+      opacity: 0.8;
+    }
+
+    #uploadBtn {
+      background: #1890ff;
+      color: white;
+    }
+
+    #cancelBtn {
+      background: #ff4d4f;
+      color: white;
+    }
+
+    /* 表格样式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: 600;
+      color: #333;
+    }
+
+    tr:hover {
+      background: #fafafa;
+    }
+
+    td button {
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+
+    td button:nth-child(1) {
+      background: #52c41a;
+      color: white;
+    }
+
+    td button:nth-child(2) {
+      background: #1890ff;
+      color: white;
+    }
+
+    td button:nth-child(3) {
+      background: #ff4d4f;
+      color: white;
+    }
+
+    /* 分页样式 */
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .pagination button {
+      background: #1890ff;
+      color: white;
+    }
+
+    .pagination span {
+      margin: 0 15px;
+      color: #666;
+    }
+
+    /* 状态标签 */
+    .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+
+    .status-pending {
+      background: #fff7e6;
+      color: #fa8c16;
+    }
+
+    .status-approved {
+      background: #f6ffed;
+      color: #52c41a;
+    }
+
+    .status-rejected {
+      background: #fff1f0;
+      color: #ff4d4f;
+    }
+
+    .status-archived {
+      background: #f0f0f0;
+      color: #999;
+    }
+
+    /* 信息提示 */
+    .info-box {
+      padding: 15px;
+      background: #e6f7ff;
+      border-left: 4px solid #1890ff;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .info-box h3 {
+      color: #1890ff;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .info-box ul {
+      margin-left: 20px;
+      color: #666;
+    }
+
+    .info-box li {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📁 材料管理系统</h1>
+
+    <div class="info-box">
+      <h3>功能说明</h3>
+      <ul>
+        <li>✅ 支持大文件上传（最大1GB）</li>
+        <li>✅ 分片上传和断点续传</li>
+        <li>✅ 文件哈希验证（SHA256/MD5）</li>
+        <li>✅ 版本管理和历史记录</li>
+        <li>✅ 审核流程管理</li>
+      </ul>
+    </div>
+
+    <!-- 文件上传区域 -->
+    <div class="section">
+      <h2>📤 文件上传</h2>
+      <div id="uploaderContainer"></div>
+    </div>
+
+    <!-- 材料列表区域 -->
+    <div class="section">
+      <h2>📋 材料列表</h2>
+      <div id="materialListContainer">
+        <p style="text-align: center; color: #999; padding: 40px 0;">
+          加载中...
+        </p>
+      </div>
+    </div>
+
+    <!-- 操作日志 -->
+    <div class="section">
+      <h2>📝 操作日志</h2>
+      <div id="logContainer" style="background: #f5f5f5; padding: 15px; border-radius: 4px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+        <div style="color: #999;">等待操作...</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // 导入前端示例代码
+    import {
+      setAuthToken,
+      getMaterials,
+      downloadMaterial,
+      deleteMaterial,
+      FileUploader,
+      MaterialList
+    } from './frontend_example.js';
+
+    // 日志记录函数
+    function log(message, type = 'info') {
+      const logContainer = document.getElementById('logContainer');
+      const time = new Date().toLocaleTimeString();
+      const colors = {
+        info: '#1890ff',
+        success: '#52c41a',
+        error: '#ff4d4f',
+        warning: '#fa8c16'
+      };
+      
+      const logEntry = document.createElement('div');
+      logEntry.style.color = colors[type] || colors.info;
+      logEntry.style.marginBottom = '5px';
+      logEntry.textContent = `[${time}] ${message}`;
+      
+      logContainer.insertBefore(logEntry, logContainer.firstChild);
+      
+      // 限制日志条数
+      while (logContainer.children.length > 50) {
+        logContainer.removeChild(logContainer.lastChild);
+      }
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', async () => {
+      log('系统初始化中...', 'info');
+
+      // 设置认证令牌（实际使用时从登录接口获取）
+      const token = localStorage.getItem('auth_token') || 'YOUR_JWT_TOKEN';
+      setAuthToken(token);
+      log('认证令牌已设置', 'success');
+
+      // 初始化文件上传组件
+      try {
+        const uploader = new FileUploader('uploaderContainer');
+        window.uploader = uploader;
+        log('文件上传组件初始化成功', 'success');
+      } catch (error) {
+        log(`文件上传组件初始化失败: ${error.message}`, 'error');
+      }
+
+      // 初始化材料列表组件
+      try {
+        const materialList = new MaterialList('materialListContainer');
+        window.materialList = materialList;
+        log('材料列表组件初始化成功', 'success');
+      } catch (error) {
+        log(`材料列表组件初始化失败: ${error.message}`, 'error');
+        document.getElementById('materialListContainer').innerHTML = `
+          <p style="text-align: center; color: #ff4d4f; padding: 40px 0;">
+            加载失败: ${error.message}<br>
+            <small>请确保后端服务已启动并配置正确的认证令牌</small>
+          </p>
+        `;
+      }
+
+      log('系统初始化完成', 'success');
+    });
+
+    // 全局函数：下载材料
+    window.downloadMaterial = async (materialId) => {
+      try {
+        log(`开始下载材料 ID: ${materialId}`, 'info');
+        await downloadMaterial(materialId);
+        log(`材料下载成功`, 'success');
+      } catch (error) {
+        log(`材料下载失败: ${error.message}`, 'error');
+        alert(`下载失败: ${error.message}`);
+      }
+    };
+
+    // 全局函数：查看版本
+    window.viewVersions = async (materialId) => {
+      try {
+        log(`查看材料版本 ID: ${materialId}`, 'info');
+        // 这里可以打开一个模态框显示版本历史
+        alert(`查看版本功能待实现（材料ID: ${materialId}）`);
+      } catch (error) {
+        log(`查看版本失败: ${error.message}`, 'error');
+      }
+    };
+
+    // 全局函数：删除材料
+    window.deleteMaterial = async (materialId) => {
+      if (!confirm('确定要删除这个材料吗？')) {
+        return;
+      }
+
+      try {
+        log(`删除材料 ID: ${materialId}`, 'info');
+        await deleteMaterial(materialId, true);
+        log(`材料删除成功`, 'success');
+        
+        // 刷新列表
+        if (window.materialList) {
+          await window.materialList.loadMaterials();
+          window.materialList.render();
+        }
+      } catch (error) {
+        log(`材料删除失败: ${error.message}`, 'error');
+        alert(`删除失败: ${error.message}`);
+      }
+    };
+  </script>
+</body>
+</html>

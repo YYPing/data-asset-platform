@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { usePermissionStore } from '@/stores/permission'
 import { ElMessage } from 'element-plus'
 
-const routes: RouteRecordRaw[] = [
+// 基础路由（不需要权限）
+const constantRoutes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'Login',
@@ -12,25 +14,29 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: false,
     },
   },
-  // 数据大屏（独立布局，无需认证）
   {
-    path: '/screen',
-    name: 'DataScreen',
-    component: () => import('@/views/screen/index.vue'),
+    path: '/404',
+    name: 'NotFound',
+    component: () => import('@/views/error/404.vue'),
     meta: {
-      title: '数据资产大屏',
+      title: '页面不存在',
       requiresAuth: false,
     },
   },
+]
+
+// 主要路由（需要权限）
+const asyncRoutes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Layout',
-    component: () => import('@/views/layout/index.vue'),
+    component: () => import('@/layouts/MainLayout.vue'),
     redirect: '/dashboard',
     meta: {
       requiresAuth: true,
     },
     children: [
+      // 首页
       {
         path: '/dashboard',
         name: 'Dashboard',
@@ -50,111 +56,69 @@ const routes: RouteRecordRaw[] = [
           title: '资产管理',
           icon: 'Box',
           requiresAuth: true,
-          roles: ['admin', 'asset_manager', 'viewer'],
+          roles: ['admin', 'center_auditor', 'data_holder'],
         },
         children: [
           {
-            path: '/assets/list',
+            path: 'list',
             name: 'AssetList',
-            component: () => import('@/views/assets/list.vue'),
+            component: () => import('@/views/assets/index.vue'),
             meta: {
               title: '资产列表',
               requiresAuth: true,
             },
           },
           {
-            path: '/assets/create',
-            name: 'AssetCreate',
-            component: () => import('@/views/assets/create.vue'),
-            meta: {
-              title: '新建资产',
-              requiresAuth: true,
-              roles: ['admin', 'asset_manager'],
-            },
-          },
-          {
-            path: '/assets/:id',
+            path: 'detail/:id',
             name: 'AssetDetail',
             component: () => import('@/views/assets/detail.vue'),
             meta: {
               title: '资产详情',
               requiresAuth: true,
+              hideInMenu: true,
             },
           },
           {
-            path: '/assets/:id/edit',
-            name: 'AssetEdit',
-            component: () => import('@/views/assets/edit.vue'),
+            path: 'form',
+            name: 'AssetForm',
+            component: () => import('@/views/assets/form.vue'),
             meta: {
-              title: '编辑资产',
+              title: '资产登记',
               requiresAuth: true,
-              roles: ['admin', 'asset_manager'],
+              roles: ['admin', 'data_holder'],
             },
           },
         ],
-      },
-      // 材料管理
-      {
-        path: '/materials',
-        name: 'Materials',
-        component: () => import('@/views/materials/index.vue'),
-        meta: {
-          title: '材料管理',
-          icon: 'Document',
-          requiresAuth: true,
-          roles: ['admin', 'asset_manager'],
-        },
-      },
-      // 证书管理
-      {
-        path: '/certificates',
-        name: 'Certificates',
-        component: () => import('@/views/certificates/index.vue'),
-        meta: {
-          title: '证书管理',
-          icon: 'Stamp',
-          requiresAuth: true,
-          roles: ['admin', 'asset_manager'],
-        },
       },
       // 工作流管理
       {
         path: '/workflow',
         name: 'Workflow',
-        redirect: '/workflow/instances',
+        redirect: '/workflow/pending',
         meta: {
           title: '工作流',
           icon: 'CircleCheck',
           requiresAuth: true,
-          roles: ['admin', 'asset_manager', 'evaluator'],
+          roles: ['admin', 'center_auditor', 'evaluator'],
         },
         children: [
           {
-            path: '/workflow/instances',
-            name: 'WorkflowInstances',
-            component: () => import('@/views/workflow/instances.vue'),
-            meta: {
-              title: '流程实例',
-              requiresAuth: true,
-            },
-          },
-          {
-            path: '/workflow/definitions',
-            name: 'WorkflowDefinitions',
-            component: () => import('@/views/workflow/definitions.vue'),
-            meta: {
-              title: '流程定义',
-              requiresAuth: true,
-              roles: ['admin'],
-            },
-          },
-          {
-            path: '/workflow/tasks',
-            name: 'WorkflowTasks',
-            component: () => import('@/views/workflow/tasks.vue'),
+            path: 'pending',
+            name: 'WorkflowPending',
+            component: () => import('@/views/workflow/pending.vue'),
             meta: {
               title: '待办任务',
               requiresAuth: true,
+            },
+          },
+          {
+            path: 'detail/:id',
+            name: 'WorkflowDetail',
+            component: () => import('@/views/workflow/detail.vue'),
+            meta: {
+              title: '流程详情',
+              requiresAuth: true,
+              hideInMenu: true,
             },
           },
         ],
@@ -163,34 +127,13 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/assessment',
         name: 'Assessment',
-        redirect: '/assessment/records',
+        component: () => import('@/views/assessment/index.vue'),
         meta: {
           title: '评估管理',
           icon: 'DataAnalysis',
           requiresAuth: true,
           roles: ['admin', 'evaluator'],
         },
-        children: [
-          {
-            path: '/assessment/records',
-            name: 'AssessmentRecords',
-            component: () => import('@/views/assessment/records.vue'),
-            meta: {
-              title: '评估记录',
-              requiresAuth: true,
-            },
-          },
-          {
-            path: '/assessment/templates',
-            name: 'AssessmentTemplates',
-            component: () => import('@/views/assessment/templates.vue'),
-            meta: {
-              title: '评估模板',
-              requiresAuth: true,
-              roles: ['admin'],
-            },
-          },
-        ],
       },
       // 统计分析
       {
@@ -201,6 +144,7 @@ const routes: RouteRecordRaw[] = [
           title: '统计分析',
           icon: 'TrendCharts',
           requiresAuth: true,
+          roles: ['admin', 'center_auditor', 'regulator'],
         },
       },
       // 审计日志
@@ -212,7 +156,7 @@ const routes: RouteRecordRaw[] = [
           title: '审计日志',
           icon: 'List',
           requiresAuth: true,
-          roles: ['admin'],
+          roles: ['admin', 'auditor', 'regulator'],
         },
       },
       // 通知中心
@@ -235,62 +179,17 @@ const routes: RouteRecordRaw[] = [
           title: '系统管理',
           icon: 'Setting',
           requiresAuth: true,
-          roles: ['admin'],
+          roles: ['admin', 'system'],
         },
         children: [
           {
-            path: '/system/users',
+            path: 'users',
             name: 'SystemUsers',
             component: () => import('@/views/system/users.vue'),
             meta: {
               title: '用户管理',
               icon: 'User',
               requiresAuth: true,
-              roles: ['admin'],
-            },
-          },
-          {
-            path: '/system/organizations',
-            name: 'SystemOrganizations',
-            component: () => import('@/views/system/organizations.vue'),
-            meta: {
-              title: '机构管理',
-              icon: 'OfficeBuilding',
-              requiresAuth: true,
-              roles: ['admin'],
-            },
-          },
-          {
-            path: '/system/dict',
-            name: 'SystemDict',
-            component: () => import('@/views/system/dict.vue'),
-            meta: {
-              title: '数据字典',
-              icon: 'Collection',
-              requiresAuth: true,
-              roles: ['admin'],
-            },
-          },
-          {
-            path: '/system/config',
-            name: 'SystemConfig',
-            component: () => import('@/views/system/config.vue'),
-            meta: {
-              title: '系统配置',
-              icon: 'Tools',
-              requiresAuth: true,
-              roles: ['admin'],
-            },
-          },
-          {
-            path: '/system/jobs',
-            name: 'SystemJobs',
-            component: () => import('@/views/system/jobs.vue'),
-            meta: {
-              title: '定时任务',
-              icon: 'Timer',
-              requiresAuth: true,
-              roles: ['admin'],
             },
           },
         ],
@@ -299,35 +198,46 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/profile',
         name: 'Profile',
-        component: () => import('@/views/profile/index.vue'),
+        component: () => import('@/views/placeholder.vue'),
         meta: {
           title: '个人中心',
           requiresAuth: true,
+          hideInMenu: true,
         },
       },
     ],
   },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    redirect: '/dashboard',
-  },
 ]
 
+// 创建路由实例
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes: [...constantRoutes, ...asyncRoutes],
+  scrollBehavior: () => ({ top: 0 }),
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+let hasInitialized = false
+
+router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
-  const requiresAuth = to.meta.requiresAuth !== false
+  const permissionStore = usePermissionStore()
 
   // 设置页面标题
   if (to.meta.title) {
     document.title = `${to.meta.title} - 数据资产管理平台`
+  } else {
+    document.title = '数据资产管理平台'
   }
+
+  // 从本地存储初始化用户信息（仅首次）
+  if (!hasInitialized) {
+    userStore.initFromStorage()
+    hasInitialized = true
+  }
+
+  // 判断是否需要认证
+  const requiresAuth = to.meta.requiresAuth !== false
 
   // 如果不需要认证，直接放行
   if (!requiresAuth) {
@@ -349,17 +259,60 @@ router.beforeEach((to, from, next) => {
     return
   }
 
+  // 已登录，生成权限路由（仅首次）
+  if (!permissionStore.hasRoutes && userStore.role) {
+    try {
+      permissionStore.generateRoutes(userStore.role)
+    } catch (error) {
+      console.error('Failed to generate routes:', error)
+      ElMessage.error('权限初始化失败')
+      await userStore.logout()
+      next('/login')
+      return
+    }
+  }
+
   // 检查角色权限
   const roles = to.meta.roles as string[] | undefined
   if (roles && roles.length > 0) {
     if (!userStore.hasRole(roles)) {
       ElMessage.error('您没有权限访问该页面')
-      next(from.path || '/dashboard')
+      // 如果是从其他页面跳转过来的，返回上一页；否则跳转到首页
+      if (from.path && from.path !== '/login') {
+        next(from.path)
+      } else {
+        next('/dashboard')
+      }
       return
     }
   }
 
+  // 检查路径权限
+  if (!permissionStore.canAccessPath(to.path)) {
+    ElMessage.error('您没有权限访问该页面')
+    if (from.path && from.path !== '/login') {
+      next(from.path)
+    } else {
+      next('/dashboard')
+    }
+    return
+  }
+
   next()
+})
+
+// 路由错误处理
+router.onError((error) => {
+  console.error('Router error:', error)
+  ElMessage.error('页面加载失败，请刷新重试')
+})
+
+// 404 处理
+router.beforeResolve((to) => {
+  // 如果路由不存在，重定向到 404
+  if (to.matched.length === 0) {
+    return '/404'
+  }
 })
 
 export default router

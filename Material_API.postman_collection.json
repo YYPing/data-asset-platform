@@ -1,0 +1,479 @@
+{
+  "info": {
+    "name": "材料管理 API",
+    "description": "数据资产管理平台 - 材料管理模块 API 集合",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "YOUR_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "material_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "CRUD 操作",
+      "item": [
+        {
+          "name": "获取材料列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials?page=1&page_size=20&asset_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "page_size", "value": "20"},
+                {"key": "asset_id", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "获取材料详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}"]
+            }
+          }
+        },
+        {
+          "name": "创建材料记录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asset_id\": 1,\n  \"material_name\": \"数据情况说明书\",\n  \"material_type\": \"文档\",\n  \"stage\": \"registration\",\n  \"file_hash\": \"abc123def456...\",\n  \"is_required\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials"]
+            }
+          }
+        },
+        {
+          "name": "更新材料信息",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"material_name\": \"数据情况说明书（更新版）\",\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}"]
+            }
+          }
+        },
+        {
+          "name": "删除材料（软删除）",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}?soft_delete=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}"],
+              "query": [
+                {"key": "soft_delete", "value": "true"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "文件上传",
+      "item": [
+        {
+          "name": "1. 初始化上传",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"session_id\", jsonData.session_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asset_id\": 1,\n  \"material_name\": \"大文件测试\",\n  \"material_type\": \"文档\",\n  \"stage\": \"registration\",\n  \"is_required\": true,\n  \"file_name\": \"large_file.pdf\",\n  \"file_size\": 52428800\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "upload"]
+            }
+          }
+        },
+        {
+          "name": "2. 上传分片",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "chunk_index",
+                  "value": "0",
+                  "type": "text"
+                },
+                {
+                  "key": "chunk_data",
+                  "type": "file",
+                  "src": "/path/to/chunk/file"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{session_id}}/upload-chunk",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{session_id}}", "upload-chunk"]
+            }
+          }
+        },
+        {
+          "name": "3. 完成上传",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "material_name",
+                  "value": "大文件测试",
+                  "type": "text"
+                },
+                {
+                  "key": "material_type",
+                  "value": "文档",
+                  "type": "text"
+                },
+                {
+                  "key": "stage",
+                  "value": "registration",
+                  "type": "text"
+                },
+                {
+                  "key": "is_required",
+                  "value": "true",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{session_id}}/complete-upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{session_id}}", "complete-upload"]
+            }
+          }
+        },
+        {
+          "name": "取消上传",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{session_id}}/cancel-upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{session_id}}", "cancel-upload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "文件下载",
+      "item": [
+        {
+          "name": "生成下载链接",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}/download?expires_in=3600",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}", "download"],
+              "query": [
+                {"key": "expires_in", "value": "3600"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "哈希验证",
+      "item": [
+        {
+          "name": "获取材料哈希",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}/hash?algorithm=sha256",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}", "hash"],
+              "query": [
+                {"key": "algorithm", "value": "sha256"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "验证材料完整性",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expected_hash\": \"abc123def456...\",\n  \"algorithm\": \"sha256\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}/verify",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}", "verify"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "版本管理",
+      "item": [
+        {
+          "name": "创建新版本",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_hash\": \"def456abc789...\",\n  \"file_path\": \"path/to/new/version\",\n  \"file_size\": 1024000,\n  \"change_description\": \"更新数据范围和格式\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}/versions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}", "versions"]
+            }
+          }
+        },
+        {
+          "name": "获取版本历史",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}/versions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}", "versions"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "审核流程",
+      "item": [
+        {
+          "name": "提交审核",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"请审核该材料\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}/submit",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}", "submit"]
+            }
+          }
+        },
+        {
+          "name": "审核通过",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"材料齐全，审核通过\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}", "approve"]
+            }
+          }
+        },
+        {
+          "name": "审核驳回",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"缺少必要信息，请补充后重新提交\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/materials/{{material_id}}/reject",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materials", "{{material_id}}", "reject"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+# Alembic迁移脚本目录
+
+本目录包含数据资产管理平台的数据库迁移脚本。
+
+## 使用方法
+
+### 生成新迁移
+```bash
+cd src/backend
+alembic revision --autogenerate -m "描述信息"
+```
+
+### 执行迁移
+```bash
+# 升级到最新版本
+alembic upgrade head
+
+# 升级到指定版本
+alembic upgrade <revision>
+
+# 回滚一个版本
+alembic downgrade -1
+
+# 回滚到指定版本
+alembic downgrade <revision>
+```
+
+### 查看迁移历史
+```bash
+# 查看当前版本
+alembic current
+
+# 查看迁移历史
+alembic history
+
+# 查看待执行的迁移
+alembic heads
+```
+
+## 注意事项
+
+1. 生成迁移脚本后，请仔细检查生成的SQL是否正确
+2. 分区表（如audit_logs）的分区需要手动管理
+3. 全文搜索索引需要先安装zhparser扩展
+4. 生产环境迁移前请先备份数据库

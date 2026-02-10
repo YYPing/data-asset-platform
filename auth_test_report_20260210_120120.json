@@ -1,0 +1,38 @@
+{
+  "module": "认证与权限模块",
+  "timestamp": "2026-02-10T12:01:20.685702",
+  "duration": "0:00:00.504453",
+  "summary": {
+    "total_tests": 5,
+    "passed": 1,
+    "failed": 4,
+    "pass_rate": 20.0
+  },
+  "details": [
+    {
+      "test": "password_hashing",
+      "status": "failed",
+      "message": "密码哈希测试失败: No module named 'redis'"
+    },
+    {
+      "test": "token_creation",
+      "status": "failed",
+      "message": "Token创建测试失败: No module named 'redis'"
+    },
+    {
+      "test": "user_model",
+      "status": "failed",
+      "message": "用户模型测试失败: 'hashed_password' is an invalid keyword argument for User"
+    },
+    {
+      "test": "role_permissions",
+      "status": "passed",
+      "message": "角色定义正常: admin, center_auditor, evaluator, data_holder, auditor, regulator, system"
+    },
+    {
+      "test": "security_config",
+      "status": "failed",
+      "message": "安全配置测试失败: No module named 'redis'"
+    }
+  ]
+}
