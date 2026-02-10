@@ -60,7 +60,7 @@ service.interceptors.response.use(
       return Promise.reject(new Error(res.message || '请求失败'))
     }
 
-    return res
+    return res.data
   },
   async (error: AxiosError<ApiResponse>) => {
     console.error('Response error:', error)
@@ -136,4 +136,24 @@ function handleTokenExpired() {
   ElMessage.warning('登录已过期，请重新登录')
 }
 
-export default service
+// 导出类型化的请求函数
+export default function request<T = any>(config: AxiosRequestConfig): Promise<T> {
+  return service(config) as Promise<T>
+}
+
+// 为了兼容性，也导出service的方法
+request.get = <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+  return service.get(url, config) as Promise<T>
+}
+
+request.post = <T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+  return service.post(url, data, config) as Promise<T>
+}
+
+request.put = <T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+  return service.put(url, data, config) as Promise<T>
+}
+
+request.delete = <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+  return service.delete(url, config) as Promise<T>
+}

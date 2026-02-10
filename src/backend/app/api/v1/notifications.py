@@ -18,7 +18,7 @@ from app.schemas.notification import (
 from app.services.notification import NotificationService
 
 
-router = APIRouter(prefix="/notifications", tags=["通知"])
+router = APIRouter(prefix="", tags=["通知"])
 
 
 @router.get("/", response_model=dict)

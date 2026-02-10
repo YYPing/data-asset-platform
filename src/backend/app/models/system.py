@@ -16,7 +16,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List, TYPE_CHECKING
 
 from sqlalchemy import String, Integer, ForeignKey, Text, DateTime, Boolean, BigInteger, Index, CheckConstraint, UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -96,7 +96,7 @@ class AuditLog(Base):
     
     # 详细信息
     detail: Mapped[Optional[Dict[str, Any]]] = mapped_column(
-        JSONB, 
+        JSON, 
         nullable=True,
         comment="操作详情（JSON格式）"
     )
@@ -467,7 +467,7 @@ class AsyncJob(Base):
         comment="任务类型"
     )
     payload: Mapped[Optional[Dict[str, Any]]] = mapped_column(
-        JSONB, 
+        JSON, 
         nullable=True,
         comment="任务参数（JSON格式）"
     )
@@ -480,7 +480,7 @@ class AsyncJob(Base):
         comment="状态：pending/running/completed/failed/cancelled"
     )
     result: Mapped[Optional[Dict[str, Any]]] = mapped_column(
-        JSONB, 
+        JSON, 
         nullable=True,
         comment="执行结果（JSON格式）"
     )

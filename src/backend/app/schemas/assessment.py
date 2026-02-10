@@ -3,7 +3,7 @@
 """
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, List
+from typing import Optional, List, Any
 from enum import Enum
 
 from pydantic import BaseModel, Field, field_validator
@@ -160,4 +160,4 @@ class ApiResponse(BaseModel):
     """统一API响应格式"""
     code: int = Field(default=200, description="状态码")
     message: str = Field(default="success", description="响应消息")
-    data: Optional[dict | list | AssessmentRecordResponse | AssessmentDetailResponse | AssessmentListResponse] = None
+    data: Optional[Any] = None

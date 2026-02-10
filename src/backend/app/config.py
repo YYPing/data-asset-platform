@@ -18,12 +18,16 @@ class Settings(BaseSettings):
 
     # JWT
     SECRET_KEY: str = "change-me-in-production"
+    ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # 应用
     APP_NAME: str = "data-asset-platform"
     DEBUG: bool = False
+    
+    # CORS
+    CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:8000"]
 
     class Config:
         env_file = ".env"

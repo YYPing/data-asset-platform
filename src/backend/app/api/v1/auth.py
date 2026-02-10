@@ -22,7 +22,7 @@ from app.core.database import get_db
 from app.services import auth as auth_service
 
 
-router = APIRouter(prefix="/auth", tags=["认证"])
+router = APIRouter(prefix="", tags=["认证"])
 
 
 def get_client_ip(request: Request) -> Optional[str]:

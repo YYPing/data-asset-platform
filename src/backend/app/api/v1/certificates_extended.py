@@ -20,7 +20,7 @@ from app.schemas.certificate import (
 from app.services.certificate_extended import CertificateExtendedService
 
 
-router = APIRouter(prefix="/api/v1/certificates", tags=["证书管理（扩展版）"])
+router = APIRouter(prefix="", tags=["证书管理（扩展版）"])
 
 
 # ==================== 证书CRUD ====================

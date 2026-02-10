@@ -6,7 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import get_current_user, require_role
+from app.core.security import get_current_user
+from app.core.permissions import require_roles
 from app.models.user import User
 from app.schemas.user import (
     UserCreate,
@@ -31,7 +32,7 @@ async def list_users(
     status: str = Query(default=None, description="状态筛选"),
     organization_id: int = Query(default=None, description="机构ID筛选"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(["admin", "asset_manager"]))
+    current_user: User = Depends(require_roles(["admin", "asset_manager"]))
 ):
     """
     获取用户列表
@@ -65,7 +66,7 @@ async def list_users(
 async def get_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(["admin", "asset_manager"]))
+    current_user: User = Depends(require_roles(["admin", "asset_manager"]))
 ):
     """
     获取用户详情
@@ -84,7 +85,7 @@ async def get_user(
 async def create_user(
     user_data: UserCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(["admin"]))
+    current_user: User = Depends(require_roles(["admin"]))
 ):
     """
     创建新用户
@@ -108,7 +109,7 @@ async def update_user(
     user_id: int,
     user_data: UserUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(["admin"]))
+    current_user: User = Depends(require_roles(["admin"]))
 ):
     """
     更新用户信息
@@ -130,7 +131,7 @@ async def update_user(
 async def delete_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(["admin"]))
+    current_user: User = Depends(require_roles(["admin"]))
 ):
     """
     删除用户
@@ -156,7 +157,7 @@ async def delete_user(
 async def reset_user_password(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(["admin"]))
+    current_user: User = Depends(require_roles(["admin"]))
 ):
     """
     重置用户密码

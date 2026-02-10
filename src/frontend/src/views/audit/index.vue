@@ -198,7 +198,7 @@ const fetchLogs = async () => {
       params.date_to = dateRange.value[1].toISOString().split('T')[0]
     }
 
-    const { data } = await auditApi.getLogs(params)
+    const data = await auditApi.getLogs(params)
     logList.value = data.items
     pagination.total = data.total
   } catch (error) {
@@ -211,7 +211,7 @@ const fetchLogs = async () => {
 // 获取统计数据
 const fetchStats = async () => {
   try {
-    const { data } = await auditApi.getStats()
+    const data = await auditApi.getStats()
     stats.value = data
   } catch (error) {
     console.error('获取统计数据失败', error)
@@ -234,8 +234,8 @@ const handleExport = async () => {
       params.date_to = dateRange.value[1].toISOString().split('T')[0]
     }
 
-    const { data } = await auditApi.exportLogs(params)
-    
+    const data = await auditApi.exportLogs(params)
+
     // 创建下载链接
     const blob = new Blob([data], { type: 'text/csv' })
     const url = window.URL.createObjectURL(blob)

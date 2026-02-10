@@ -332,3 +332,22 @@ class CertificateQueryParams(BaseModel):
     page_size: int = Field(20, description="每页数量", ge=1, le=100)
     order_by: str = Field("created_at", description="排序字段")
     order_desc: bool = Field(True, description="是否降序")
+
+
+# ==================== 证书导入模型 ====================
+
+class CertificateImport(BaseModel):
+    """证书导入模型"""
+    certificate_no: str = Field(..., description="证书编号", min_length=1, max_length=100)
+    certificate_type: CertificateTypeEnum = Field(..., description="证书类型")
+    certificate_name: str = Field(..., description="证书名称", min_length=1, max_length=200)
+    issuing_authority: str = Field(..., description="颁发机构", min_length=1, max_length=200)
+    holder_name: str = Field(..., description="持有人姓名", min_length=1, max_length=100)
+    issue_date: date = Field(..., description="颁发日期")
+    expiry_date: Optional[date] = Field(None, description="有效期至")
+    description: Optional[str] = Field(None, description="证书描述", max_length=1000)
+    tags: Optional[List[str]] = Field(default_factory=list, description="标签")
+    file_url: Optional[str] = Field(None, description="文件URL")
+    file_hash: Optional[str] = Field(None, description="文件哈希值", max_length=64)
+    
+    model_config = ConfigDict(from_attributes=True)

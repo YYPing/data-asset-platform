@@ -20,7 +20,7 @@ from app.schemas.statistics import (
     WorkflowStats,
 )
 
-router = APIRouter(prefix="/statistics", tags=["statistics"])
+router = APIRouter(prefix="", tags=["statistics"])
 
 
 def _get_organization_filter(current_user: User) -> Optional[int]:

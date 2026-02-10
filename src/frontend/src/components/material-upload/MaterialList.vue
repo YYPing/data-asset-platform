@@ -258,7 +258,7 @@ const loadMaterials = async () => {
   loading.value = true
   try {
     const res = await getAssetMaterials(props.assetId, props.stage)
-    materials.value = res.data
+    materials.value = res
   } catch (error) {
     console.error('Failed to load materials:', error)
     ElMessage.error('加载材料列表失败')

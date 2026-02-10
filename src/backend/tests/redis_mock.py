@@ -10,31 +10,41 @@ import time
 
 
 class RedisMock:
-    """Redis模拟类"""
-    
+    """Redis模拟类 - 提供同步和异步方法"""
+
     def __init__(self):
         self._data: Dict[str, Any] = {}
         self._expiry: Dict[str, float] = {}
-    
-    async def get(self, key: str) -> Optional[str]:
+
+    # 同步方法（用于security.py等同步代码）
+    def setex(self, key: str, ex: int, value: Any) -> bool:
+        """模拟Redis SETEX操作（同步）"""
+        self._data[key] = value
+        if ex:
+            self._expiry[key] = time.time() + ex
+        return True
+
+    def exists(self, key: str) -> int:
+        """模拟Redis EXISTS操作（同步）"""
+        self._clean_expired()
+        return 1 if key in self._data else 0
+
+    # 异步方法（用于异步代码）
+    async def async_get(self, key: str) -> Optional[str]:
         """模拟Redis GET操作"""
         self._clean_expired()
         value = self._data.get(key)
         if value is None:
             return None
         return json.dumps(value) if isinstance(value, (dict, list)) else str(value)
-    
-    async def set(self, key: str, value: Any, ex: Optional[int] = None) -> bool:
+
+    async def async_set(self, key: str, value: Any, ex: Optional[int] = None) -> bool:
         """模拟Redis SET操作"""
         self._data[key] = value
         if ex:
             self._expiry[key] = time.time() + ex
         return True
-    
-    async def setex(self, key: str, ex: int, value: Any) -> bool:
-        """模拟Redis SETEX操作"""
-        return await self.set(key, value, ex)
-    
+
     async def delete(self, key: str) -> int:
         """模拟Redis DELETE操作"""
         if key in self._data:
@@ -43,12 +53,7 @@ class RedisMock:
                 del self._expiry[key]
             return 1
         return 0
-    
-    async def exists(self, key: str) -> int:
-        """模拟Redis EXISTS操作"""
-        self._clean_expired()
-        return 1 if key in self._data else 0
-    
+
     async def expire(self, key: str, ex: int) -> bool:
         """模拟Redis EXPIRE操作"""
         if key in self._data:

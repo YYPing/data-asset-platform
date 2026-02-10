@@ -388,8 +388,8 @@ const uploadFileInChunks = async (fileItem: FileItem) => {
     total_chunks: totalChunks
   })
 
-  const uploadId = initRes.data.upload_id
-  const existingChunks = initRes.data.existing_chunks || []
+  const uploadId = initRes.upload_id
+  const existingChunks = initRes.existing_chunks || []
 
   // 上传分片
   for (let i = 0; i < totalChunks; i++) {

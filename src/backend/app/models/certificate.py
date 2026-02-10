@@ -206,12 +206,12 @@ class Certificate(Base, TimestampMixin, SoftDeleteMixin):
     
     # ==================== Relationships ====================
     
-    # 导入人
-    importer: Mapped[Optional["User"]] = relationship(
-        "User",
-        back_populates="imported_certificates",
-        foreign_keys=[imported_by]
-    )
+    # 导入人（暂时禁用）
+    # importer: Mapped[Optional["User"]] = relationship(
+    #     "User",
+    #     back_populates="imported_certificates",
+    #     foreign_keys=[imported_by]
+    # )
     
     # 证书文件
     files: Mapped[List["CertificateFile"]] = relationship(

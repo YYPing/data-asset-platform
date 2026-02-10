@@ -19,7 +19,7 @@ from app.schemas.certificate import (
 from app.services.certificate import CertificateService
 
 
-router = APIRouter(prefix="/api/v1/certificates", tags=["证书管理"])
+router = APIRouter(prefix="", tags=["证书管理"])
 
 
 @router.post("/import", response_model=ApiResponse, summary="导入证书")

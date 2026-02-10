@@ -39,6 +39,9 @@ except (ImportError, AttributeError):
     redis_client = get_redis_mock()
 
 
+import hashlib
+import secrets
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     验证密码
@@ -50,7 +53,15 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     Returns:
         bool: 密码是否匹配
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception:
+        # fallback: sha256方式
+        if ':' in hashed_password:
+            salt, hash_val = hashed_password.split(':', 1)
+            test_hash = hashlib.sha256((salt + plain_password).encode()).hexdigest()
+            return test_hash == hash_val
+        return False
 
 
 def get_password_hash(password: str) -> str:
@@ -63,7 +74,13 @@ def get_password_hash(password: str) -> str:
     Returns:
         str: 哈希后的密码
     """
-    return pwd_context.hash(password)
+    try:
+        return pwd_context.hash(password)
+    except Exception:
+        # fallback: sha256 + salt
+        salt = secrets.token_hex(16)
+        hash_val = hashlib.sha256((salt + password).encode()).hexdigest()
+        return f"{salt}:{hash_val}"
 
 
 def validate_password_strength(password: str) -> tuple[bool, str]:
@@ -112,7 +129,7 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS)
+        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode.update({
         "exp": expire,

@@ -419,18 +419,18 @@ async function submitAssessment() {
     try {
       if (isCompliance) {
         await submitComplianceAssessment(
-          currentAssessment.value.asset_id,
+          currentAssessment.value!.asset_id,
           complianceForm
         )
       } else {
         await submitValuationAssessment(
-          currentAssessment.value.asset_id,
+          currentAssessment.value!.asset_id,
           valuationForm
         )
       }
 
       // 标记为完成
-      await completeAssessment(currentAssessment.value.id)
+      await completeAssessment(currentAssessment.value!.id)
 
       ElMessage.success('评估提交成功')
       dialogVisible.value = false

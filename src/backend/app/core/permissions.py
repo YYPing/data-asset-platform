@@ -11,7 +11,7 @@ from sqlalchemy import select, and_, or_
 from app.models.user import User, Organization
 from app.models.system import Permission, RolePermission
 from app.core.security import get_current_user
-from app.db.session import get_db
+from app.database import get_db
 
 
 # 角色定义

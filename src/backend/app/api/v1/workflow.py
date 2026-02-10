@@ -23,7 +23,7 @@ from app.schemas.workflow import (
     ApiResponse
 )
 
-router = APIRouter(prefix="/api/v1/workflow", tags=["workflow"])
+router = APIRouter(prefix="", tags=["workflow"])
 
 
 # ==================== Helper Functions ====================

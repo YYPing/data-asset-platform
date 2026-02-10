@@ -342,12 +342,12 @@ class User(Base, TimestampMixin):
         foreign_keys="SystemConfig.updated_by"
     )
     
-    # 导入的登记证书
-    imported_certificates: Mapped[List["RegistrationCertificate"]] = relationship(
-        "RegistrationCertificate",
-        back_populates="importer",
-        foreign_keys="RegistrationCertificate.imported_by"
-    )
+    # 导入的登记证书（暂时禁用，模型类名不匹配）
+    # imported_certificates: Mapped[List["RegistrationCertificate"]] = relationship(
+    #     "RegistrationCertificate",
+    #     back_populates="importer",
+    #     foreign_keys="RegistrationCertificate.imported_by"
+    # )
     
     # 操作日志
     operation_logs: Mapped[List["OperationLog"]] = relationship(

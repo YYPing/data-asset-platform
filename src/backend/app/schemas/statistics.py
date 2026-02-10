@@ -1,7 +1,7 @@
 """
 统计分析 Pydantic 模型
 """
-from typing import Optional, List
+from typing import Optional, List, Any
 from datetime import datetime
 from pydantic import BaseModel, Field
 
@@ -73,4 +73,4 @@ class StatisticsResponse(BaseModel):
     """统计响应基类"""
     code: int = 200
     message: str = "success"
-    data: dict | list | OverviewStats | TrendStats | OrganizationStatsResponse | CategoryStatsResponse | AssessmentStats | WorkflowStats
+    data: Any

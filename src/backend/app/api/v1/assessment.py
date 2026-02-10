@@ -24,7 +24,7 @@ from app.schemas.assessment import (
 )
 
 
-router = APIRouter(prefix="/api/v1/assessment", tags=["评估管理"])
+router = APIRouter(prefix="", tags=["评估管理"])
 
 
 def _to_response(assessment) -> dict:

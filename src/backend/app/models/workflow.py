@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
 
 from sqlalchemy import String, Integer, ForeignKey, Text, DateTime, Boolean, Index, CheckConstraint
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
@@ -68,12 +68,12 @@ class WorkflowDefinition(Base, TimestampMixin):
     
     # 工作流配置（JSONB格式）
     nodes: Mapped[Dict[str, Any]] = mapped_column(
-        JSONB, 
+        JSON, 
         nullable=False,
         comment="节点配置"
     )
     transitions: Mapped[Dict[str, Any]] = mapped_column(
-        JSONB, 
+        JSON, 
         nullable=False,
         comment="转换规则"
     )

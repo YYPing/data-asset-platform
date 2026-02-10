@@ -446,7 +446,7 @@ const beforeUpload = (file: File) => {
 const uploadFiles = async (assetId: number) => {
   if (!uploadRef.value) return
 
-  const files = uploadRef.value.uploadFiles
+  const files = (uploadRef.value as any).uploadFiles
   if (files.length === 0) return
 
   try {

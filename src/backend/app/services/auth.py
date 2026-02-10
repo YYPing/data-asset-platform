@@ -42,35 +42,26 @@ async def create_audit_log(
     status: str = "success"
 ) -> None:
     """
-    创建审计日志
-    
-    Args:
-        db: 数据库会话
-        user_id: 用户ID
-        action: 操作类型
-        resource_type: 资源类型
-        resource_id: 资源ID
-        details: 详细信息
-        ip_address: IP地址
-        status: 状态（success/failure）
+    创建审计日志（使用独立session，不影响主事务）
     """
     try:
-        audit_log = AuditLog(
-            user_id=user_id,
-            action=action,
-            resource_type=resource_type,
-            resource_id=resource_id,
-            details=details,
-            ip_address=ip_address,
-            status=status,
-            created_at=datetime.utcnow()
-        )
-        db.add(audit_log)
-        await db.commit()
+        from app.core.database import AsyncSessionLocal
+        async with AsyncSessionLocal() as audit_session:
+            audit_log = AuditLog(
+                user_id=user_id,
+                action=action,
+                resource_type=resource_type,
+                resource_id=resource_id,
+                detail=details,
+                ip_address=ip_address,
+                result=status,
+                created_at=datetime.utcnow()
+            )
+            audit_session.add(audit_log)
+            await audit_session.commit()
     except Exception as e:
         # 审计日志失败不应影响主流程
         print(f"创建审计日志失败: {e}")
-        await db.rollback()
 
 
 async def authenticate_user(
@@ -314,7 +305,7 @@ async def login(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer",
-        expires_in=settings.ACCESS_TOKEN_EXPIRE_HOURS * 3600
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
     
     return LoginResponse(user=user_info, token=token_response)
@@ -382,7 +373,7 @@ async def refresh_access_token(
         access_token=new_access_token,
         refresh_token=new_refresh_token,
         token_type="bearer",
-        expires_in=settings.ACCESS_TOKEN_EXPIRE_HOURS * 3600
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 
 

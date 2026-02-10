@@ -216,7 +216,7 @@ const totalCategoryCount = computed(() => {
 // 获取概览数据
 const fetchOverview = async () => {
   try {
-    const { data } = await statisticsApi.getOverview()
+    const data = await statisticsApi.getOverview()
     Object.assign(overview, data)
   } catch (error) {
     ElMessage.error('获取概览数据失败')
@@ -226,7 +226,7 @@ const fetchOverview = async () => {
 // 获取趋势数据
 const fetchTrend = async () => {
   try {
-    const { data } = await statisticsApi.getTrend()
+    const data = await statisticsApi.getTrend()
     trendData.value = data
   } catch (error) {
     ElMessage.error('获取趋势数据失败')
@@ -237,7 +237,7 @@ const fetchTrend = async () => {
 const fetchOrgStats = async () => {
   loadingOrg.value = true
   try {
-    const { data } = await statisticsApi.getByOrganization()
+    const data = await statisticsApi.getByOrganization()
     orgStats.value = data
   } catch (error) {
     ElMessage.error('获取组织统计失败')
@@ -250,7 +250,7 @@ const fetchOrgStats = async () => {
 const fetchCategoryStats = async () => {
   loadingCategory.value = true
   try {
-    const { data } = await statisticsApi.getByCategory()
+    const data = await statisticsApi.getByCategory()
     categoryStats.value = data
   } catch (error) {
     ElMessage.error('获取分类统计失败')

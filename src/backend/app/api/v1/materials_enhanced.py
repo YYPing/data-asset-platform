@@ -22,7 +22,7 @@ from app.schemas.material import (
 )
 from app.services.material_enhanced import material_service
 
-router = APIRouter(prefix="/api/v1/materials", tags=["materials"])
+router = APIRouter(prefix="", tags=["materials"])
 
 
 # ==================== CRUD 操作 ====================

@@ -1,3 +1,4 @@
+from sqlalchemy import Text
 """
 Base models and mixins for SQLAlchemy 2.0
 数据资产管理平台 - 基础模型定义
@@ -13,7 +14,7 @@ from typing import Optional, Any
 
 from sqlalchemy import DateTime, func, event, String, Index
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr
-from sqlalchemy.dialects.postgresql import TSVECTOR
+
 
 
 class Base(DeclarativeBase):
@@ -101,7 +102,7 @@ class FullTextSearchMixin:
     
     # 全文搜索向量列（由触发器自动更新）
     search_vector: Mapped[Optional[str]] = mapped_column(
-        TSVECTOR,
+        Text,
         nullable=True,
         comment="全文搜索向量"
     )

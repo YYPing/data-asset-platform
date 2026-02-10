@@ -20,7 +20,7 @@ from app.schemas.audit import (
 from app.services.audit import AuditService
 
 
-router = APIRouter(prefix="/audit", tags=["审计日志"])
+router = APIRouter(prefix="", tags=["审计日志"])
 
 
 def _can_view_all_logs(user: User) -> bool:

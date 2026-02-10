@@ -232,7 +232,7 @@ const formRules: FormRules = {
 const fetchUsers = async () => {
   loading.value = true
   try {
-    const { data } = await userApi.getUsers({
+    const data = await userApi.getUsers({
       page: pagination.page,
       page_size: pagination.pageSize,
       q: searchQuery.value || undefined,
@@ -312,8 +312,8 @@ const handleResetPassword = async (row: User) => {
         type: 'warning'
       }
     )
-    
-    const { data } = await userApi.resetPassword(row.id)
+
+    const data = await userApi.resetPassword(row.id)
     await ElMessageBox.alert(
       `新密码：${data.new_password}`,
       '密码已重置',

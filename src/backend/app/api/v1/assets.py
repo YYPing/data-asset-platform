@@ -30,7 +30,7 @@ from app.schemas.asset import (
 from app.services.asset import AssetService
 from app.utils.audit import AuditLogger
 
-router = APIRouter(prefix="/api/v1/assets", tags=["assets"])
+router = APIRouter(prefix="", tags=["assets"])
 
 
 def success_response(data, message: str = "success"):

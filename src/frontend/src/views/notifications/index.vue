@@ -40,7 +40,7 @@
         <el-table-column label="状态" width="80" align="center">
           <template #default="{ row }">
             <el-icon v-if="!row.is_read" color="#409eff" :size="20">
-              <CircleFilled />
+              <CircleCheck />
             </el-icon>
             <el-icon v-else color="#c0c4cc" :size="20">
               <CircleCheck />
@@ -109,7 +109,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Check, CircleFilled, CircleCheck } from '@element-plus/icons-vue'
+import { Check, CircleCheck } from '@element-plus/icons-vue'
 import { notificationApi, type Notification } from '@/api/system'
 
 const router = useRouter()
@@ -140,7 +140,7 @@ const fetchNotifications = async () => {
       params.is_read = false
     }
 
-    const { data } = await notificationApi.getNotifications(params)
+    const data = await notificationApi.getNotifications(params)
     notificationList.value = data.items
     pagination.total = data.total
   } catch (error) {
@@ -153,7 +153,7 @@ const fetchNotifications = async () => {
 // 获取未读数量
 const fetchUnreadCount = async () => {
   try {
-    const { data } = await notificationApi.getUnreadCount()
+    const data = await notificationApi.getUnreadCount()
     unreadCount.value = data.count
   } catch (error) {
     console.error('获取未读数量失败', error)

@@ -68,7 +68,7 @@
         label-width="100px"
       >
         <el-form-item label="审批环节">
-          <el-input v-model="currentItem.node_name" disabled />
+          <el-input v-model="currentItem!.node_name" disabled />
         </el-form-item>
 
         <el-form-item label="审批意见" prop="comment">
@@ -259,11 +259,11 @@ async function submitApproval() {
     submitting.value = true
     try {
       if (form.action === 'approve') {
-        await approveWorkflow(currentItem.value.node_id, form.comment)
+        await approveWorkflow(currentItem.value!.node_id, form.comment)
         ElMessage.success('审批通过成功')
       } else {
         await rejectWorkflow(
-          currentItem.value.node_id,
+          currentItem.value!.node_id,
           form.comment,
           form.rejectToNode
         )
