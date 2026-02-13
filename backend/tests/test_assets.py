@@ -1,55 +1,21 @@
-import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from app.core.database import Base, get_db
+from tests.conftest import TestingSessionLocal
 from app.main import app
-
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test_assets.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    from app.models.organization import Organization  # noqa
-    from app.models.user import User  # noqa
-    from app.models.asset import DataAsset  # noqa
-    from app.models.stage import StageRecord  # noqa
-    from app.models.material import StageMaterial  # noqa
-    from app.models.audit import AuditLog  # noqa
-    from app.models.approval import ApprovalRecord  # noqa
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
-
 
 client = TestClient(app)
 
 
 def _create_org_and_user(role="data_holder"):
-    """Helper: create org, register user with org_id, login, return token."""
     db = TestingSessionLocal()
     from app.models.organization import Organization
+    from app.models.user import User
+    from app.core.security import get_password_hash
+
     org = Organization(name="测试公司", org_type="enterprise")
     db.add(org)
     db.commit()
     db.refresh(org)
 
-    from app.models.user import User, Role
-    from app.core.security import get_password_hash
     user = User(
         username=f"user_{role}",
         hashed_password=get_password_hash("pass123"),

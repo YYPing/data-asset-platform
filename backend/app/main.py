@@ -6,6 +6,8 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.assets import router as assets_router
 from app.api.v1.stages import router as stages_router
 from app.api.v1.materials import router as materials_router
+from app.api.v1.audit import router as audit_router
+from app.api.v1.statistics import router as stats_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -21,6 +23,8 @@ app.include_router(auth_router)
 app.include_router(assets_router)
 app.include_router(stages_router)
 app.include_router(materials_router)
+app.include_router(audit_router)
+app.include_router(stats_router)
 
 
 @app.get("/api/health")
