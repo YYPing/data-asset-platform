@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.db
+.env
+
+# Uploads
+uploads/
+
+# IDE
+.vscode/
+.idea/
+
+# Planning files (session-specific)
+task_plan.md
+findings.md
+progress.md
